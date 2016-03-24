@@ -27,7 +27,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     AVCaptureDeviceInput *captureInputFront;
     AVCaptureDeviceInput *captureInputBack;
     AVCaptureVideoDataOutput *captureOutput;
-    AVCaptureDevice *currentCaptureDevice;
+//    AVCaptureDevice *currentCaptureDevice;
     dispatch_queue_t captureQueue;
     AVCaptureVideoPreviewLayer *previewLayer;
     AVCaptureDevicePosition currentCameraPosition;
@@ -161,7 +161,6 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
             case AVCaptureDevicePositionFront:
             {
                 captureInputFront = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
-                currentCaptureDevice = captureInputFront.device;
             }
                 break;
             default:
@@ -268,10 +267,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     if (VideoDisplayMode_OpenGLES != currentDisplayMode) {
         return;
     }
-//    AVCaptureMetadataOutput
     CFDictionaryRef dic = CMCopyDictionaryOfAttachments(nil, sampleBuffer, kCMAttachmentMode_ShouldPropagate);
-    
-//    (nil, imageDataSampleBuffer, CMAttachmentMode(kCMAttachmentMode_ShouldPropagate)).takeUnretainedValue()
     
     CVImageBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     CIImage *image = [CIImage imageWithCVPixelBuffer:pixelBuffer];
