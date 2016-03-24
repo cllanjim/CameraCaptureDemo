@@ -13,6 +13,10 @@
 		856648FC1CA269000075FC36 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 856648FA1CA269000075FC36 /* Main.storyboard */; };
 		856648FE1CA269010075FC36 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 856648FD1CA269010075FC36 /* Assets.xcassets */; };
 		856649011CA269010075FC36 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 856648FF1CA269010075FC36 /* LaunchScreen.storyboard */; };
+		856649441CA3893D0075FC36 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 856649431CA3893D0075FC36 /* OpenGLES.framework */; };
+		856649461CA3894A0075FC36 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 856649451CA389490075FC36 /* QuartzCore.framework */; };
+		856649491CA38AB00075FC36 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 856649481CA38AB00075FC36 /* GLKit.framework */; };
+		8566494B1CA38F520075FC36 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8566494A1CA38F520075FC36 /* CoreImage.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +30,10 @@
 		856648FD1CA269010075FC36 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		856649001CA269010075FC36 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		856649021CA269010075FC36 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		856649431CA3893D0075FC36 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		856649451CA389490075FC36 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		856649481CA38AB00075FC36 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		8566494A1CA38F520075FC36 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +41,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8566494B1CA38F520075FC36 /* CoreImage.framework in Frameworks */,
+				856649491CA38AB00075FC36 /* GLKit.framework in Frameworks */,
+				856649461CA3894A0075FC36 /* QuartzCore.framework in Frameworks */,
+				856649441CA3893D0075FC36 /* OpenGLES.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,9 +86,21 @@
 		856648F11CA269000075FC36 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				856649471CA3895F0075FC36 /* Framework */,
 				856648F21CA269000075FC36 /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		856649471CA3895F0075FC36 /* Framework */ = {
+			isa = PBXGroup;
+			children = (
+				8566494A1CA38F520075FC36 /* CoreImage.framework */,
+				856649481CA38AB00075FC36 /* GLKit.framework */,
+				856649451CA389490075FC36 /* QuartzCore.framework */,
+				856649431CA3893D0075FC36 /* OpenGLES.framework */,
+			);
+			name = Framework;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -306,6 +330,7 @@
 				856649071CA269010075FC36 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

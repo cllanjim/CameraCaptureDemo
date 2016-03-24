@@ -10,12 +10,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CameraCaptureDemo/ViewController.m"
-            timestampString = "480410834.415536"
+            timestampString = "480499071.314459"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "155"
-            endingLineNumber = "155"
-            landmarkName = "-captureOutput:didOutputSampleBuffer:fromConnection:"
+            startingLineNumber = "99"
+            endingLineNumber = "99"
+            landmarkName = "-startCapture"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
