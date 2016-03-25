@@ -271,15 +271,83 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     
     CVImageBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     CIImage *image = [CIImage imageWithCVPixelBuffer:pixelBuffer];
+    
+    CIImage *transformImage = [image imageByApplyingTransform:CGAffineTransformRotate(CGAffineTransformIdentity, M_PI/2)];
+    /*(1 2) (3 4) (5 6) (7 8)
+     *镜像*
+     */
+    CIImage *orientationImage = [image imageByApplyingOrientation:5];
+//    orientationImage = [orientationImage imageByCroppingToRect:self.view.bounds];
+    
     if ([EAGLContext currentContext] != openGLContext) {
         [EAGLContext setCurrentContext:openGLContext];
     }
+#if 0
+    /*test iamge */
+    dispatch_sync(dispatch_get_main_queue(), ^{
+            UIView *view = [self.view viewWithTag:1000];
+            if (view) {
+                [view removeFromSuperview];
+            }
+            UIImage *pic = [UIImage imageWithCIImage:transformImage];
+            UIImageView *picImageView = [[UIImageView alloc] initWithImage:pic];
+            picImageView.tag = 100;
+            picImageView.frame = self.view.bounds;
+            [self.view addSubview:picImageView];
+
+    });
+#endif
+    
 //    NSLog(@"x:%f y:%f w:%f h:%f", image.extent.origin.x, image.extent.origin.y, image.extent.size.width, image.extent.size.height);
     [glkView bindDrawable];
-    [ciContext drawImage:image inRect:image.extent fromRect:image.extent];
+    CGRect rect = orientationImage.extent;
+    CGFloat scale = [UIScreen mainScreen].scale;
+    CGRect destRect = CGRectApplyAffineTransform(self.view.bounds, CGAffineTransformMakeScale(scale, scale));
+    [ciContext drawImage:orientationImage inRect:destRect fromRect:rect];
     [glkView display];
     
     
+    return;
+    //data
+    if(CVPixelBufferLockBaseAddress(pixelBuffer, 0) == kCVReturnSuccess)
+    {
+        UInt8 *bufferbasePtr = (UInt8 *)CVPixelBufferGetBaseAddress(pixelBuffer);
+        UInt8 *bufferPtr = (UInt8 *)CVPixelBufferGetBaseAddressOfPlane(pixelBuffer,0);
+        UInt8 *bufferPtr1 = (UInt8 *)CVPixelBufferGetBaseAddressOfPlane(pixelBuffer,1);
+        size_t buffeSize = CVPixelBufferGetDataSize(pixelBuffer);
+        size_t width = CVPixelBufferGetWidth(pixelBuffer);
+        size_t height = CVPixelBufferGetHeight(pixelBuffer);
+        size_t bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer);
+        size_t bytesrow0 = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer,0);
+        size_t bytesrow1  = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer,1);
+        size_t bytesrow2 = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer,2);
+        UInt8 *yuv420_data = (UInt8 *)malloc(width * height *3/ 2);//buffer to store YUV with layout YYYYYYYYUUVV
+        
+        /* convert NV21 data to YUV420*/
+        
+        UInt8 *pY = bufferPtr ;
+        UInt8 *pUV = bufferPtr1;
+        UInt8 *pU = yuv420_data + width*height;
+        UInt8 *pV = pU + width*height/4;
+        for(int i =0;i<height;i++)
+        {
+            memcpy(yuv420_data+i*width,pY+i*bytesrow0,width);
+        }
+        for(int j = 0;j<height/2;j++)
+        {
+            for(int i =0;i<width/2;i++)
+            {
+                *(pU++) = pUV[i<<1];
+                *(pV++) = pUV[(i<<1) + 1];
+            }
+            pUV+=bytesrow1;
+        }
+        //add code to push yuv420_data to video encoder here
+        
+        free(yuv420_data);
+        /* unlock the buffer*/
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+    }
 }
 
 @end
