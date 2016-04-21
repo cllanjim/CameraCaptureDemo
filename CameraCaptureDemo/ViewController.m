@@ -10,8 +10,12 @@
 #import <AVFoundation/AVFoundation.h>
 #import <OpenGLES/EAGL.h>
 #import <OpenGLES/gltypes.h>
+#import <OpenGLES/ES2/gl.h>
 #import <GLKit/GLKView.h>
 #import <CoreImage/CoreImage.h>
+#import <AVKit/AVKit.h>
+
+#import <AVFoundation/AVFoundation.h>
 
 typedef NS_ENUM(NSInteger, VideoDisplayMode)
 {
@@ -47,7 +51,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     currentDisplayMode = VideoDisplayMode_OpenGLES;
     frames = 10;
     
@@ -95,6 +99,14 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 
 - (void)startCapture
 {
+//    NSError *error = nil;
+//    AVAudioSession *session = [AVAudioSession sharedInstance];
+//    [session setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+//    [session setActive:YES error:&error];
+//    
+//    NSRunLoop   *runloop = [NSRunLoop currentRunLoop];
+    
+    
 //    NSLog(@"%@", currentCaptureDevice.activeFormat);
     [captureSession startRunning];
 }
@@ -102,6 +114,10 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 - (void)stopCapture
 {
     [captureSession stopRunning];
+    
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    [glkView display];
 }
 
 - (void)changeCamera
@@ -178,7 +194,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
         captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
     }
     else {
-        captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
+        captureSession.sessionPreset = AVCaptureSessionPreset352x288;
     }
     currentCameraPosition = AVCaptureDevicePositionFront;
     [self changeCameraPosition:currentCameraPosition];

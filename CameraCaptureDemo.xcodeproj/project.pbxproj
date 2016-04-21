@@ -18,6 +18,7 @@
 		856649491CA38AB00075FC36 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 856649481CA38AB00075FC36 /* GLKit.framework */; };
 		8566494B1CA38F520075FC36 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8566494A1CA38F520075FC36 /* CoreImage.framework */; };
 		8566494D1CA3EEDC0075FC36 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8566494C1CA3EEDC0075FC36 /* VideoToolbox.framework */; };
+		85A257C51CA8E08E001202FE /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85A257C41CA8E08E001202FE /* AVKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		856649481CA38AB00075FC36 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		8566494A1CA38F520075FC36 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		8566494C1CA3EEDC0075FC36 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
+		85A257C41CA8E08E001202FE /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,6 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85A257C51CA8E08E001202FE /* AVKit.framework in Frameworks */,
 				8566494D1CA3EEDC0075FC36 /* VideoToolbox.framework in Frameworks */,
 				8566494B1CA38F520075FC36 /* CoreImage.framework in Frameworks */,
 				856649491CA38AB00075FC36 /* GLKit.framework in Frameworks */,
@@ -98,6 +101,7 @@
 		856649471CA3895F0075FC36 /* Framework */ = {
 			isa = PBXGroup;
 			children = (
+				85A257C41CA8E08E001202FE /* AVKit.framework */,
 				8566494C1CA3EEDC0075FC36 /* VideoToolbox.framework */,
 				8566494A1CA38F520075FC36 /* CoreImage.framework */,
 				856649481CA38AB00075FC36 /* GLKit.framework */,
@@ -294,6 +298,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = CameraCaptureDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.grandstream.CameraCaptureDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -309,6 +314,7 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = CameraCaptureDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.grandstream.CameraCaptureDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
