@@ -190,8 +190,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 //    }
 //    captureConnection.videoOrientation = AVCaptureVideoOrientationLandscapeLeft;
     
-    if ([captureSession canSetSessionPreset:AVCaptureSessionPreset1280x720]) {
-        captureSession.sessionPreset = AVCaptureSessionPreset1280x720;
+    if ([captureSession canSetSessionPreset:AVCaptureSessionPresetLow]) {
+        captureSession.sessionPreset = AVCaptureSessionPresetLow;
     }
     else {
         captureSession.sessionPreset = AVCaptureSessionPreset352x288;
