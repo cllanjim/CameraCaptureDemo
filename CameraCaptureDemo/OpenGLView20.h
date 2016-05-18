@@ -15,39 +15,39 @@
 
 @interface OpenGLView20 : UIView
 {
-	/** 
-	 OpenGL绘图上下文
-	 */
-    EAGLContext             *_glContext; 
-	
-	/** 
-	 帧缓冲区
-	 */
-    GLuint                  _framebuffer; 
-	
-	/** 
-	 渲染缓冲区
-	 */
-    GLuint                  _renderBuffer; 
-	
-	/** 
-	 着色器句柄
-	 */
-    GLuint                  _program;  
-	
-	/** 
-	 YUV纹理数组
-	 */
-    GLuint                  _textureYUV[3]; 
-	
-	/** 
-	 视频宽度
-	 */
-    GLuint                  _videoW;  
-	
-	/** 
-	 视频高度
-	 */
+    /**
+     OpenGL绘图上下文
+     */
+    EAGLContext             *_glContext;
+    
+    /**
+     帧缓冲区
+     */
+    GLuint                  _framebuffer;
+    
+    /**
+     渲染缓冲区
+     */
+    GLuint                  _renderBuffer;
+    
+    /**
+     着色器句柄
+     */
+    GLuint                  _program;
+    
+    /**
+     YUV纹理数组
+     */
+    GLuint                  _textureYUV[3];
+    
+    /**
+     视频宽度
+     */
+    GLuint                  _videoW;
+    
+    /**
+     视频高度
+     */
     GLuint                  _videoH;
     
     GLsizei                 _viewScale;

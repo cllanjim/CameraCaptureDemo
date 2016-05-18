@@ -17,6 +17,8 @@
 
 #import <AVFoundation/AVFoundation.h>
 
+#import "GSOpenGLESView.h"
+
 typedef NS_ENUM(NSInteger, VideoDisplayMode)
 {
     VideoDisplayMode_PreviewLayer = 0,
@@ -61,11 +63,24 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
             [self initPreviewLayer];
             break;
         case VideoDisplayMode_OpenGLES:
-            [self initOpenGLES];
+//            [self initOpenGLES];
             break;
         default:
             break;
     }
+    
+    GSOpenGLESView *glview = [[GSOpenGLESView alloc] initWithFrame:self.view.bounds];
+    [self.view addSubview:glview];
+    
+    /*
+     NSString *yuvFile = [[NSBundle mainBundle] pathForResource:@"jpgimage1_image_640_480" ofType:@"yuv"];
+     yuvData = [NSData dataWithContentsOfFile:yuvFile];
+     NSLog(@"the reader length is %lu", (unsigned long)yuvData.length);
+     
+     UInt8 * pFrameRGB = (UInt8*)[yuvData bytes];
+     [myview setVideoSize:640 height:480];
+     [myview displayYUV420pData:pFrameRGB width:640 height:480];
+     */
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
     btn.frame = CGRectMake(0, 0, 100, 44);
@@ -108,6 +123,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     
     
 //    NSLog(@"%@", currentCaptureDevice.activeFormat);
+    
     [captureSession startRunning];
 }
 

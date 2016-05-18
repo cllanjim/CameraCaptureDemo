@@ -19,6 +19,8 @@
 		8566494B1CA38F520075FC36 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8566494A1CA38F520075FC36 /* CoreImage.framework */; };
 		8566494D1CA3EEDC0075FC36 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8566494C1CA3EEDC0075FC36 /* VideoToolbox.framework */; };
 		85A257C51CA8E08E001202FE /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85A257C41CA8E08E001202FE /* AVKit.framework */; };
+		85B169131CEC1AEA00DE9DFD /* GSOpenGLESView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85B169121CEC1AEA00DE9DFD /* GSOpenGLESView.m */; };
+		85B1693A1CEC800D00DE9DFD /* jpgimage1_image_640_480.yuv in Resources */ = {isa = PBXBuildFile; fileRef = 85B169391CEC800D00DE9DFD /* jpgimage1_image_640_480.yuv */; };
 		85B567F81CE2C4B100A80A5E /* OpenGLView20.m in Sources */ = {isa = PBXBuildFile; fileRef = 85B567F71CE2C4B100A80A5E /* OpenGLView20.m */; };
 /* End PBXBuildFile section */
 
@@ -39,6 +41,9 @@
 		8566494A1CA38F520075FC36 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		8566494C1CA3EEDC0075FC36 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
 		85A257C41CA8E08E001202FE /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
+		85B169111CEC1AEA00DE9DFD /* GSOpenGLESView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSOpenGLESView.h; sourceTree = "<group>"; };
+		85B169121CEC1AEA00DE9DFD /* GSOpenGLESView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSOpenGLESView.m; sourceTree = "<group>"; };
+		85B169391CEC800D00DE9DFD /* jpgimage1_image_640_480.yuv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = jpgimage1_image_640_480.yuv; sourceTree = "<group>"; };
 		85B567F61CE2C4B100A80A5E /* OpenGLView20.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLView20.h; sourceTree = "<group>"; };
 		85B567F71CE2C4B100A80A5E /* OpenGLView20.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OpenGLView20.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -85,9 +90,12 @@
 				856648F81CA269000075FC36 /* ViewController.m */,
 				85B567F61CE2C4B100A80A5E /* OpenGLView20.h */,
 				85B567F71CE2C4B100A80A5E /* OpenGLView20.m */,
+				85B169111CEC1AEA00DE9DFD /* GSOpenGLESView.h */,
+				85B169121CEC1AEA00DE9DFD /* GSOpenGLESView.m */,
 				856648FA1CA269000075FC36 /* Main.storyboard */,
 				856648FD1CA269010075FC36 /* Assets.xcassets */,
 				856648FF1CA269010075FC36 /* LaunchScreen.storyboard */,
+				85B169391CEC800D00DE9DFD /* jpgimage1_image_640_480.yuv */,
 				856649021CA269010075FC36 /* Info.plist */,
 				856648F11CA269000075FC36 /* Supporting Files */,
 			);
@@ -173,6 +181,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85B1693A1CEC800D00DE9DFD /* jpgimage1_image_640_480.yuv in Resources */,
 				856649011CA269010075FC36 /* LaunchScreen.storyboard in Resources */,
 				856648FE1CA269010075FC36 /* Assets.xcassets in Resources */,
 				856648FC1CA269000075FC36 /* Main.storyboard in Resources */,
@@ -187,6 +196,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				856648F91CA269000075FC36 /* ViewController.m in Sources */,
+				85B169131CEC1AEA00DE9DFD /* GSOpenGLESView.m in Sources */,
 				856648F61CA269000075FC36 /* AppDelegate.m in Sources */,
 				856648F31CA269000075FC36 /* main.m in Sources */,
 				85B567F81CE2C4B100A80A5E /* OpenGLView20.m in Sources */,

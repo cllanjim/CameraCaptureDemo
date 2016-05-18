@@ -27,29 +27,29 @@ enum TextureType
 
 @interface OpenGLView20()
 
-/** 
+/**
  初始化YUV纹理
  */
 - (void)setupYUVTexture;
 
-/** 
+/**
  创建缓冲区
  @return 成功返回TRUE 失败返回FALSE
  */
 - (BOOL)createFrameAndRenderBuffer;
 
-/** 
+/**
  销毁缓冲区
  */
 - (void)destoryFrameAndRenderBuffer;
 
 //加载着色器
-/** 
+/**
  初始化YUV纹理
  */
 - (void)loadShader;
 
-/** 
+/**
  编译着色代码
  @param shader        代码
  @param shaderType    类型
@@ -57,7 +57,7 @@ enum TextureType
  */
 - (GLuint)compileShader:(NSString*)shaderCode withType:(GLenum)shaderType;
 
-/** 
+/**
  渲染
  */
 - (void)render;
@@ -95,7 +95,7 @@ enum TextureType
     {
         return NO;
     }
-	
+    
     [self setupYUVTexture];
     [self loadShader];
     glUseProgram(_program);
@@ -168,21 +168,21 @@ enum TextureType
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXU]);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXV]);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
 - (void)render
@@ -196,7 +196,7 @@ enum TextureType
         -1.0f,  1.0f,
         1.0f,  1.0f,
     };
-
+    
     
     static const GLfloat coordVertices[] = {
         0.0f, 1.0f,
@@ -204,9 +204,9 @@ enum TextureType
         0.0f,  0.0f,
         1.0f,  0.0f,
     };
-	
-	
-	// Update attribute values
+    
+    
+    // Update attribute values
     glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, squareVertices);
     glEnableVertexAttribArray(ATTRIB_VERTEX);
     
@@ -273,19 +273,19 @@ uniform sampler2D SamplerV;\
 \
 void main(void)\
 {\
-    mediump vec3 yuv;\
-    lowp vec3 rgb;\
-    \
-    yuv.x = texture2D(SamplerY, TexCoordOut).r;\
-    yuv.y = texture2D(SamplerU, TexCoordOut).r - 0.5;\
-    yuv.z = texture2D(SamplerV, TexCoordOut).r - 0.5;\
-    \
-    rgb = mat3( 1,       1,         1,\
-               0,       -0.39465,  2.03211,\
-               1.13983, -0.58060,  0) * yuv;\
-    \
-    gl_FragColor = vec4(rgb, 1);\
-    \
+mediump vec3 yuv;\
+lowp vec3 rgb;\
+\
+yuv.x = texture2D(SamplerY, TexCoordOut).r;\
+yuv.y = texture2D(SamplerU, TexCoordOut).r - 0.5;\
+yuv.z = texture2D(SamplerV, TexCoordOut).r - 0.5;\
+\
+rgb = mat3( 1,       1,         1,\
+0,       -0.39465,  2.03211,\
+1.13983, -0.58060,  0) * yuv;\
+\
+gl_FragColor = vec4(rgb, 1);\
+\
 }"
 
 #define VSH @"attribute vec4 position;\
@@ -294,39 +294,39 @@ varying vec2 TexCoordOut;\
 \
 void main(void)\
 {\
-    gl_Position = position;\
-    TexCoordOut = TexCoordIn;\
+gl_Position = position;\
+TexCoordOut = TexCoordIn;\
 }"
 
-/** 
+/**
  加载着色器
  */
 - (void)loadShader
 {
-	/** 
-	 1
-	 */
+    /**
+     1
+     */
     GLuint vertexShader = [self compileShader:VSH withType:GL_VERTEX_SHADER];
     GLuint fragmentShader = [self compileShader:FSH withType:GL_FRAGMENT_SHADER];
     
-	/** 
-	 2
-	 */
+    /**
+     2
+     */
     _program = glCreateProgram();
     glAttachShader(_program, vertexShader);
     glAttachShader(_program, fragmentShader);
     
-	/** 
-	 绑定需要在link之前
-	 */
+    /**
+     绑定需要在link之前
+     */
     glBindAttribLocation(_program, ATTRIB_VERTEX, "position");
     glBindAttribLocation(_program, ATTRIB_TEXTURE, "TexCoordIn");
     
     glLinkProgram(_program);
     
-	/** 
-	 3
-	 */
+    /**
+     3
+     */
     GLint linkSuccess;
     glGetProgramiv(_program, GL_LINK_STATUS, &linkSuccess);
     if (linkSuccess == GL_FALSE) {
@@ -338,19 +338,20 @@ void main(void)\
     }
     
     if (vertexShader)
-		glDeleteShader(vertexShader);
+        glDeleteShader(vertexShader);
     if (fragmentShader)
-		glDeleteShader(fragmentShader);
+        glDeleteShader(fragmentShader);
 }
 
 - (GLuint)compileShader:(NSString*)shaderString withType:(GLenum)shaderType
 {
     
-   	/** 
-	 1
-	 */
+   	/**
+     1
+     */
+    NSError *error = nil;
     if (!shaderString) {
-//        NSLog(@"Error loading shader: %@", error.localizedDescription);
+        NSLog(@"Error loading shader: %@", error.localizedDescription);
         exit(1);
     }
     else
@@ -358,26 +359,26 @@ void main(void)\
         //NSLog(@"shader code-->%@", shaderString);
     }
     
-	/** 
-	 2
-	 */
-    GLuint shaderHandle = glCreateShader(shaderType);    
+    /**
+     2
+     */
+    GLuint shaderHandle = glCreateShader(shaderType);
     
-	/** 
-	 3
-	 */
-    const char * shaderStringUTF8 = [shaderString UTF8String];    
+    /**
+     3
+     */
+    const char * shaderStringUTF8 = [shaderString UTF8String];
     int shaderStringLength = [shaderString length];
     glShaderSource(shaderHandle, 1, &shaderStringUTF8, &shaderStringLength);
     
-	/** 
-	 4
-	 */
+    /**
+     4
+     */
     glCompileShader(shaderHandle);
     
-	/** 
-	 5
-	 */
+    /**
+     5
+     */
     GLint compileSuccess;
     glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &compileSuccess);
     if (compileSuccess == GL_FALSE) {
@@ -408,6 +409,9 @@ void main(void)\
         [EAGLContext setCurrentContext:_glContext];
         
         glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXY]);
+        
+        //glTexSubImage2D (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* pixels);
+        
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RED_EXT, GL_UNSIGNED_BYTE, data);
         
         //[self debugGlError];
@@ -415,7 +419,7 @@ void main(void)\
         glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXU]);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w/2, h/2, GL_RED_EXT, GL_UNSIGNED_BYTE, data + w * h);
         
-       // [self debugGlError];
+        // [self debugGlError];
         
         glBindTexture(GL_TEXTURE_2D, _textureYUV[TEXV]);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w/2, h/2, GL_RED_EXT, GL_UNSIGNED_BYTE, data + w * h * 5 / 4);
@@ -453,8 +457,8 @@ void main(void)\
     _videoH = height;
     
     void *blackData = malloc(width * height * 1.5);
-	if(blackData)
-		//bzero(blackData, width * height * 1.5);
+    if(blackData)
+        //bzero(blackData, width * height * 1.5);
         memset(blackData, 0x0, width * height * 1.5);
     
     [EAGLContext setCurrentContext:_glContext];
