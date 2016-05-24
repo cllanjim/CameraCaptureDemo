@@ -18,6 +18,8 @@
 #import <AVFoundation/AVFoundation.h>
 
 #import "GSOpenGLESView.h"
+#import "BufferManager.h"
+#import "OpenGLView20.h"
 
 typedef NS_ENUM(NSInteger, VideoDisplayMode)
 {
@@ -45,6 +47,11 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     
     VideoDisplayMode currentDisplayMode;
     NSUInteger frames;
+    
+    BufferManager *yuv420Data;
+    
+    dispatch_queue_t displayQueue;
+    OpenGLView20 *displayView;
 }
 
 @end
@@ -56,6 +63,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     
     currentDisplayMode = VideoDisplayMode_OpenGLES;
     frames = 10;
+    
+    yuv420Data = [[BufferManager alloc] init];
     
     [self initCaptureSession];
     switch (currentDisplayMode) {
@@ -70,17 +79,21 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     }
     
     GSOpenGLESView *glview = [[GSOpenGLESView alloc] initWithFrame:self.view.bounds];
-    [self.view addSubview:glview];
+//    [self.view addSubview:glview];
     
     /*
      NSString *yuvFile = [[NSBundle mainBundle] pathForResource:@"jpgimage1_image_640_480" ofType:@"yuv"];
      yuvData = [NSData dataWithContentsOfFile:yuvFile];
      NSLog(@"the reader length is %lu", (unsigned long)yuvData.length);
-     
+    
      UInt8 * pFrameRGB = (UInt8*)[yuvData bytes];
      [myview setVideoSize:640 height:480];
      [myview displayYUV420pData:pFrameRGB width:640 height:480];
-     */
+    */
+    displayQueue = dispatch_queue_create("videoDisplay", DISPATCH_QUEUE_SERIAL);
+    displayView = [[OpenGLView20 alloc] initWithFrame:CGRectMake(0, 0, 352, 288)];
+    [self.view addSubview:displayView];
+    [NSTimer scheduledTimerWithTimeInterval:frames/60 target:self selector:@selector(displayVideo) userInfo:nil repeats:YES];
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
     btn.frame = CGRectMake(0, 0, 100, 44);
@@ -110,6 +123,18 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)displayVideo
+{
+    dispatch_async(displayQueue, ^{
+        NSData *data = [yuv420Data getData];
+        if (data) {
+            UInt8 * pFrameRGB = (UInt8 *)[data bytes];
+            [displayView setVideoSize:352 height:288];
+            [displayView displayYUV420pData:pFrameRGB width:352 height:288];
+        }
+    });
 }
 
 - (void)startCapture
@@ -206,8 +231,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 //    }
 //    captureConnection.videoOrientation = AVCaptureVideoOrientationLandscapeLeft;
     
-    if ([captureSession canSetSessionPreset:AVCaptureSessionPresetLow]) {
-        captureSession.sessionPreset = AVCaptureSessionPresetLow;
+    if ([captureSession canSetSessionPreset:AVCaptureSessionPreset352x288]) {
+        captureSession.sessionPreset = AVCaptureSessionPreset352x288;
     }
     else {
         captureSession.sessionPreset = AVCaptureSessionPreset352x288;
@@ -223,7 +248,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 #ifdef VIDEO_FORMAT_JPEG
                                                             kCVPixelFormatType_32BGRA
 #else
-                                                            kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
+                                                            kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange//NV12
 #endif
                                                             ]
                                       forKey:(NSString *)kCVPixelBufferPixelFormatTypeKey];
@@ -295,6 +320,52 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 	didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         fromConnection:(AVCaptureConnection *)connection
 {
+    
+    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    /* unlock the buffer*/
+    if(CVPixelBufferLockBaseAddress(imageBuffer, 0) == kCVReturnSuccess)
+    {
+        UInt8 *bufferbasePtr = (UInt8 *)CVPixelBufferGetBaseAddress(imageBuffer);
+        UInt8 *bufferPtr = (UInt8 *)CVPixelBufferGetBaseAddressOfPlane(imageBuffer,0);
+        UInt8 *bufferPtr1 = (UInt8 *)CVPixelBufferGetBaseAddressOfPlane(imageBuffer,1);
+        size_t buffeSize = CVPixelBufferGetDataSize(imageBuffer);
+        size_t width = CVPixelBufferGetWidth(imageBuffer);
+        size_t height = CVPixelBufferGetHeight(imageBuffer);
+        size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+        size_t bytesrow0 = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer,0);
+        size_t bytesrow1  = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer,1);
+        size_t bytesrow2 = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer,2);
+        UInt8 *yuv420_data = (UInt8 *)malloc(width * height *3/ 2);//buffer to store YUV with layout YYYYYYYYUUVV
+        
+        /* convert NV21 data to YUV420*/
+        
+        UInt8 *pY = bufferPtr ;
+        UInt8 *pUV = bufferPtr1;
+        UInt8 *pU = yuv420_data + width*height;
+        UInt8 *pV = pU + width*height/4;
+        for(int i =0;i<height;i++)
+        {
+            memcpy(yuv420_data+i*width,pY+i*bytesrow0,width);
+        }
+        for(int j = 0;j<height/2;j++)
+        {
+            for(int i =0;i<width/2;i++)
+            {
+                *(pU++) = pUV[i<<1];
+                *(pV++) = pUV[(i<<1) + 1];
+            }
+            pUV+=bytesrow1;
+        }
+        //add code to push yuv420_data to video encoder here
+        NSData *data = [NSData dataWithBytes:yuv420_data length:(width * height *3/ 2)];
+        [yuv420Data addData:data];
+        
+        free(yuv420_data);
+        /* unlock the buffer*/
+        CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+    }
+    return;
+    
     NSLog(@"%s", __FUNCTION__);
     if (VideoDisplayMode_OpenGLES != currentDisplayMode) {
         return;
@@ -375,6 +446,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
             pUV+=bytesrow1;
         }
         //add code to push yuv420_data to video encoder here
+        NSData *data = [[NSData alloc] initWithBytes:yuv420_data length:sizeof(yuv420_data)];
         
         free(yuv420_data);
         /* unlock the buffer*/

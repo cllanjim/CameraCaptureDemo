@@ -22,6 +22,8 @@
 		85B169131CEC1AEA00DE9DFD /* GSOpenGLESView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85B169121CEC1AEA00DE9DFD /* GSOpenGLESView.m */; };
 		85B1693A1CEC800D00DE9DFD /* jpgimage1_image_640_480.yuv in Resources */ = {isa = PBXBuildFile; fileRef = 85B169391CEC800D00DE9DFD /* jpgimage1_image_640_480.yuv */; };
 		85B567F81CE2C4B100A80A5E /* OpenGLView20.m in Sources */ = {isa = PBXBuildFile; fileRef = 85B567F71CE2C4B100A80A5E /* OpenGLView20.m */; };
+		85F20A2B1CF4581C009D472E /* FileOperator.m in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A2A1CF4581C009D472E /* FileOperator.m */; };
+		85F20A2E1CF45C23009D472E /* BufferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A2D1CF45C23009D472E /* BufferManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +48,10 @@
 		85B169391CEC800D00DE9DFD /* jpgimage1_image_640_480.yuv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = jpgimage1_image_640_480.yuv; sourceTree = "<group>"; };
 		85B567F61CE2C4B100A80A5E /* OpenGLView20.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLView20.h; sourceTree = "<group>"; };
 		85B567F71CE2C4B100A80A5E /* OpenGLView20.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OpenGLView20.m; sourceTree = "<group>"; };
+		85F20A291CF4581C009D472E /* FileOperator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileOperator.h; sourceTree = "<group>"; };
+		85F20A2A1CF4581C009D472E /* FileOperator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileOperator.m; sourceTree = "<group>"; };
+		85F20A2C1CF45C23009D472E /* BufferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BufferManager.h; sourceTree = "<group>"; };
+		85F20A2D1CF45C23009D472E /* BufferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BufferManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,10 +94,14 @@
 				856648F51CA269000075FC36 /* AppDelegate.m */,
 				856648F71CA269000075FC36 /* ViewController.h */,
 				856648F81CA269000075FC36 /* ViewController.m */,
+				85F20A2C1CF45C23009D472E /* BufferManager.h */,
+				85F20A2D1CF45C23009D472E /* BufferManager.m */,
 				85B567F61CE2C4B100A80A5E /* OpenGLView20.h */,
 				85B567F71CE2C4B100A80A5E /* OpenGLView20.m */,
 				85B169111CEC1AEA00DE9DFD /* GSOpenGLESView.h */,
 				85B169121CEC1AEA00DE9DFD /* GSOpenGLESView.m */,
+				85F20A291CF4581C009D472E /* FileOperator.h */,
+				85F20A2A1CF4581C009D472E /* FileOperator.m */,
 				856648FA1CA269000075FC36 /* Main.storyboard */,
 				856648FD1CA269010075FC36 /* Assets.xcassets */,
 				856648FF1CA269010075FC36 /* LaunchScreen.storyboard */,
@@ -196,9 +206,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				856648F91CA269000075FC36 /* ViewController.m in Sources */,
+				85F20A2B1CF4581C009D472E /* FileOperator.m in Sources */,
 				85B169131CEC1AEA00DE9DFD /* GSOpenGLESView.m in Sources */,
 				856648F61CA269000075FC36 /* AppDelegate.m in Sources */,
 				856648F31CA269000075FC36 /* main.m in Sources */,
+				85F20A2E1CF45C23009D472E /* BufferManager.m in Sources */,
 				85B567F81CE2C4B100A80A5E /* OpenGLView20.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
