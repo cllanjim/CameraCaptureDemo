@@ -7,6 +7,8 @@
 //
 
 #import "BufferManager.h"
+#import "FileOperator.h"
+
 @interface BufferManager()
 {
     NSLock *bufferLock;
@@ -31,6 +33,13 @@
 {
     [bufferLock lock];
     [dataArray addObject:data];
+    
+//    if ([dataArray count] == 1) {
+//        FileOperator *file = [[FileOperator alloc] init];
+//        [file createFileWithName:@"datayun420"];
+//        [file fileWriterArray:dataArray];
+//    }
+    
     [bufferLock unlock];
 }
 - (NSData *)getData

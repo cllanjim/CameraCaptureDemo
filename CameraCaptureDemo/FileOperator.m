@@ -9,7 +9,7 @@
 #import "FileOperator.h"
 @interface FileOperator()
 {
-    
+    NSString *fullPath;
 }
 
 @end
@@ -24,15 +24,28 @@
         [manager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
     }
 
-    NSString *fullPath = [path stringByAppendingPathComponent:name];
+    fullPath = [path stringByAppendingPathComponent:name];
     [manager createFileAtPath:fullPath contents:nil attributes:nil];
 }
 
 -(BOOL)fileWriter:(UInt8 *)data
 {
+    NSFileManager *manager = [NSFileManager defaultManager];
     
     return YES;
 }
+
+-(BOOL)fileWriterArray:(NSArray *)arrayData
+{
+    FILE *file = fopen([fullPath UTF8String], "wb");
+    for (NSData *d in arrayData) {
+        fwrite([d bytes], 352*288*3/2, 1, file);
+    }
+    fclose(file);
+    
+    return YES;
+}
+
 -(UInt8 *)fileReader
 {
     

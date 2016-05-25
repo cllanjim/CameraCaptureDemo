@@ -21,6 +21,9 @@
 #import "BufferManager.h"
 #import "OpenGLView20.h"
 
+#define VIDEO_WIDTH 640
+#define VIDEO_HEIGHT 480
+
 typedef NS_ENUM(NSInteger, VideoDisplayMode)
 {
     VideoDisplayMode_PreviewLayer = 0,
@@ -72,14 +75,14 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
             [self initPreviewLayer];
             break;
         case VideoDisplayMode_OpenGLES:
-//            [self initOpenGLES];
+            [self initOpenGLES];
             break;
         default:
             break;
     }
     
     GSOpenGLESView *glview = [[GSOpenGLESView alloc] initWithFrame:self.view.bounds];
-//    [self.view addSubview:glview];
+    [self.view addSubview:glview];
     
     /*
      NSString *yuvFile = [[NSBundle mainBundle] pathForResource:@"jpgimage1_image_640_480" ofType:@"yuv"];
@@ -91,7 +94,10 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
      [myview displayYUV420pData:pFrameRGB width:640 height:480];
     */
     displayQueue = dispatch_queue_create("videoDisplay", DISPATCH_QUEUE_SERIAL);
-    displayView = [[OpenGLView20 alloc] initWithFrame:CGRectMake(0, 0, 352, 288)];
+    displayView = [[OpenGLView20 alloc] initWithFrame:CGRectMake(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT)];
+    displayView.center = self.view.center;
+    displayView.transform = CGAffineTransformMakeScale(0.5f, 0.5f);
+    displayView.transform = CGAffineTransformRotate(displayView.transform, M_PI/2);
     [self.view addSubview:displayView];
     [NSTimer scheduledTimerWithTimeInterval:frames/60 target:self selector:@selector(displayVideo) userInfo:nil repeats:YES];
     
@@ -131,8 +137,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
         NSData *data = [yuv420Data getData];
         if (data) {
             UInt8 * pFrameRGB = (UInt8 *)[data bytes];
-            [displayView setVideoSize:352 height:288];
-            [displayView displayYUV420pData:pFrameRGB width:352 height:288];
+            [displayView setVideoSize:VIDEO_WIDTH height:VIDEO_HEIGHT];
+            [displayView displayYUV420pData:pFrameRGB width:VIDEO_WIDTH height:VIDEO_HEIGHT];
         }
     });
 }
@@ -231,11 +237,11 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 //    }
 //    captureConnection.videoOrientation = AVCaptureVideoOrientationLandscapeLeft;
     
-    if ([captureSession canSetSessionPreset:AVCaptureSessionPreset352x288]) {
-        captureSession.sessionPreset = AVCaptureSessionPreset352x288;
+    if ([captureSession canSetSessionPreset:AVCaptureSessionPreset640x480]) {
+        captureSession.sessionPreset = AVCaptureSessionPreset640x480;
     }
     else {
-        captureSession.sessionPreset = AVCaptureSessionPreset352x288;
+        captureSession.sessionPreset = AVCaptureSessionPreset640x480;
     }
     currentCameraPosition = AVCaptureDevicePositionFront;
     [self changeCameraPosition:currentCameraPosition];
@@ -243,6 +249,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     captureOutput = [[AVCaptureVideoDataOutput alloc]init];
     captureQueue = dispatch_queue_create("captureQueue", DISPATCH_QUEUE_SERIAL);
     [captureOutput setSampleBufferDelegate:self queue:captureQueue];
+    /*On iOS, the only supported key is kCVPixelBufferPixelFormatTypeKey. Supported pixel formats are
+     kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange, kCVPixelFormatType_420YpCbCr8BiPlanarFullRange and kCVPixelFormatType_32BGRA.*/
     captureOutput.videoSettings = [NSDictionary
                                       dictionaryWithObject:[NSNumber numberWithLong:
 #ifdef VIDEO_FORMAT_JPEG
@@ -325,17 +333,18 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     /* unlock the buffer*/
     if(CVPixelBufferLockBaseAddress(imageBuffer, 0) == kCVReturnSuccess)
     {
-        UInt8 *bufferbasePtr = (UInt8 *)CVPixelBufferGetBaseAddress(imageBuffer);
+//        UInt8 *bufferbasePtr = (UInt8 *)CVPixelBufferGetBaseAddress(imageBuffer);
         UInt8 *bufferPtr = (UInt8 *)CVPixelBufferGetBaseAddressOfPlane(imageBuffer,0);
         UInt8 *bufferPtr1 = (UInt8 *)CVPixelBufferGetBaseAddressOfPlane(imageBuffer,1);
-        size_t buffeSize = CVPixelBufferGetDataSize(imageBuffer);
+//        size_t buffeSize = CVPixelBufferGetDataSize(imageBuffer);
         size_t width = CVPixelBufferGetWidth(imageBuffer);
         size_t height = CVPixelBufferGetHeight(imageBuffer);
-        size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+//        size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
         size_t bytesrow0 = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer,0);
         size_t bytesrow1  = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer,1);
-        size_t bytesrow2 = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer,2);
+//        size_t bytesrow2 = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer,2);
         UInt8 *yuv420_data = (UInt8 *)malloc(width * height *3/ 2);//buffer to store YUV with layout YYYYYYYYUUVV
+        memset(yuv420_data, 0, width * height *3/ 2);
         
         /* convert NV21 data to YUV420*/
         
@@ -364,7 +373,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
         /* unlock the buffer*/
         CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
     }
-    return;
+//    return;
     
     NSLog(@"%s", __FUNCTION__);
     if (VideoDisplayMode_OpenGLES != currentDisplayMode) {

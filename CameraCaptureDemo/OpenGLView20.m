@@ -298,6 +298,59 @@ gl_Position = position;\
 TexCoordOut = TexCoordIn;\
 }"
 
+#if TARGET_OS_IPHONE
+#define RTC_PIXEL_FORMAT GL_LUMINANCE
+#define SHADER_VERSION
+#define VERTEX_SHADER_IN "attribute"
+#define VERTEX_SHADER_OUT "varying"
+#define FRAGMENT_SHADER_IN "varying"
+#define FRAGMENT_SHADER_OUT
+#define FRAGMENT_SHADER_COLOR "gl_FragColor"
+#define FRAGMENT_SHADER_TEXTURE "texture2D"
+#else
+#define RTC_PIXEL_FORMAT GL_RED
+#define SHADER_VERSION "#version 150\n"
+#define VERTEX_SHADER_IN "in"
+#define VERTEX_SHADER_OUT "out"
+#define FRAGMENT_SHADER_IN "in"
+#define FRAGMENT_SHADER_OUT "out vec4 fragColor;\n"
+#define FRAGMENT_SHADER_COLOR "fragColor"
+#define FRAGMENT_SHADER_TEXTURE "texture"
+#endif
+
+static const char kVertexShaderSource[] =
+SHADER_VERSION
+VERTEX_SHADER_IN " vec2 position;\n"
+VERTEX_SHADER_IN " vec2 texcoord;\n"
+VERTEX_SHADER_OUT " vec2 v_texcoord;\n"
+"void main() {\n"
+"    gl_Position = vec4(position.x, position.y, 0.0, 1.0);\n"
+"    v_texcoord = texcoord;\n"
+"}\n";
+
+// Fragment shader converts YUV values from input textures into a final RGB
+// pixel. The conversion formula is from http://www.fourcc.org/fccyvrgb.php.
+static const char kFragmentShaderSource[] =
+SHADER_VERSION
+"precision highp float;"
+FRAGMENT_SHADER_IN " vec2 v_texcoord;\n"
+"uniform lowp sampler2D s_textureY;\n"
+"uniform lowp sampler2D s_textureU;\n"
+"uniform lowp sampler2D s_textureV;\n"
+FRAGMENT_SHADER_OUT
+"void main() {\n"
+"    float y, u, v, r, g, b;\n"
+"    y = " FRAGMENT_SHADER_TEXTURE "(s_textureY, v_texcoord).r;\n"
+"    u = " FRAGMENT_SHADER_TEXTURE "(s_textureU, v_texcoord).r;\n"
+"    v = " FRAGMENT_SHADER_TEXTURE "(s_textureV, v_texcoord).r;\n"
+"    u = u - 0.5;\n"
+"    v = v - 0.5;\n"
+"    r = y + 1.403 * v;\n"
+"    g = y - 0.344 * u - 0.714 * v;\n"
+"    b = y + 1.770 * u;\n"
+"    " FRAGMENT_SHADER_COLOR " = vec4(r, g, b, 1.0);\n"
+"  }\n";
+
 /**
  加载着色器
  */
@@ -306,6 +359,8 @@ TexCoordOut = TexCoordIn;\
     /**
      1
      */
+//    NSString *vsh = [NSString stringWithUTF8String:kVertexShaderSource];
+//    NSString *fsh = [NSString stringWithUTF8String:kFragmentShaderSource];
     GLuint vertexShader = [self compileShader:VSH withType:GL_VERTEX_SHADER];
     GLuint fragmentShader = [self compileShader:FSH withType:GL_FRAGMENT_SHADER];
     

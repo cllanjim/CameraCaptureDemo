@@ -12,6 +12,7 @@
 
 -(void)createFileWithName:(NSString *)name;
 -(BOOL)fileWriter:(UInt8 *)data;
+-(BOOL)fileWriterArray:(NSArray *)arrayData;
 -(UInt8 *)fileReader;
 
 @end
