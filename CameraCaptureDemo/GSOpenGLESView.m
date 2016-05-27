@@ -14,14 +14,24 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        [self setupLayer];
-        [self setupContext];
-        [self destoryRenderAndFrameBuffer];
-        [self setupRenderBuffer];
-        [self setupFrameBuffer];
-        [self render];
+//        [self setupLayer];
+//        [self setupContext];
+//        [self destoryRenderAndFrameBuffer];
+//        [self setupRenderBuffer];
+//        [self setupFrameBuffer];
+//        [self render];
     }
     return self;
+}
+
+- (void)layoutSubviews
+{
+    [self setupLayer];
+    [self setupContext];
+    [self destoryRenderAndFrameBuffer];
+    [self setupRenderBuffer];
+    [self setupFrameBuffer];
+    [self render];
 }
 
 + (Class)layerClass
@@ -83,7 +93,7 @@
 
 - (void)render
 {
-    glClearColor(0, 1.0, 1.0, 1.0);
+    glClearColor(0.5, 1.0, 0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
     
     [_context presentRenderbuffer:GL_RENDERBUFFER];

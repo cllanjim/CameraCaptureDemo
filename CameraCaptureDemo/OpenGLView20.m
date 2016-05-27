@@ -287,14 +287,43 @@ rgb = mat3( 1,       1,         1,\
 gl_FragColor = vec4(rgb, 1);\
 \
 }"
+//#define FSH @"varying lowp vec2 TexCoordOut;\
+//\
+//uniform sampler2D SamplerY;\
+//uniform sampler2D SamplerU;\
+//uniform sampler2D SamplerV;\
+//\
+//void main(void)\
+//{\
+//precision highp float;\
+//float y, u, v, r, g, b;\
+//y = texture2D(SamplerY, TexCoordOut).r;\
+//u = texture2D(SamplerU, TexCoordOut).r;\
+//v = texture2D(SamplerU, TexCoordOut).r;\
+//u = u - 0.5;\
+//v = v - 0.5;\
+//r = y + 1.403 * v;\
+//g = y - 0.344 * u - 0.714 * v;\
+//b = y + 1.770 * u;\
+//gl_FragColor = vec4(r, g, b, 1.0);\
+//}"
 
+//#define VSH @"attribute vec4 position;\
+//attribute vec2 TexCoordIn;\
+//varying vec2 TexCoordOut;\
+//\
+//void main(void)\
+//{\
+//gl_Position = position;\
+//TexCoordOut = TexCoordIn;\
+//}"
 #define VSH @"attribute vec4 position;\
 attribute vec2 TexCoordIn;\
 varying vec2 TexCoordOut;\
 \
 void main(void)\
 {\
-gl_Position = position;\
+gl_Position = vec4(position.x, position.y, 0.0, 1.0);\
 TexCoordOut = TexCoordIn;\
 }"
 

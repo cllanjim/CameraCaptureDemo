@@ -24,6 +24,8 @@
 		85B567F81CE2C4B100A80A5E /* OpenGLView20.m in Sources */ = {isa = PBXBuildFile; fileRef = 85B567F71CE2C4B100A80A5E /* OpenGLView20.m */; };
 		85F20A2B1CF4581C009D472E /* FileOperator.m in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A2A1CF4581C009D472E /* FileOperator.m */; };
 		85F20A2E1CF45C23009D472E /* BufferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A2D1CF45C23009D472E /* BufferManager.m */; };
+		85F20A521CF826D0009D472E /* GSOpenGLESDisplayYUV420View.m in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A511CF826D0009D472E /* GSOpenGLESDisplayYUV420View.m */; };
+		85F20A551CF83DAC009D472E /* RTCI420Frame.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A541CF83DAC009D472E /* RTCI420Frame.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +54,10 @@
 		85F20A2A1CF4581C009D472E /* FileOperator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileOperator.m; sourceTree = "<group>"; };
 		85F20A2C1CF45C23009D472E /* BufferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BufferManager.h; sourceTree = "<group>"; };
 		85F20A2D1CF45C23009D472E /* BufferManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BufferManager.m; sourceTree = "<group>"; };
+		85F20A501CF826D0009D472E /* GSOpenGLESDisplayYUV420View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GSOpenGLESDisplayYUV420View.h; sourceTree = "<group>"; };
+		85F20A511CF826D0009D472E /* GSOpenGLESDisplayYUV420View.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSOpenGLESDisplayYUV420View.m; sourceTree = "<group>"; };
+		85F20A531CF83DAC009D472E /* RTCI420Frame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTCI420Frame.h; sourceTree = "<group>"; };
+		85F20A541CF83DAC009D472E /* RTCI420Frame.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RTCI420Frame.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +106,10 @@
 				85B567F71CE2C4B100A80A5E /* OpenGLView20.m */,
 				85B169111CEC1AEA00DE9DFD /* GSOpenGLESView.h */,
 				85B169121CEC1AEA00DE9DFD /* GSOpenGLESView.m */,
+				85F20A501CF826D0009D472E /* GSOpenGLESDisplayYUV420View.h */,
+				85F20A511CF826D0009D472E /* GSOpenGLESDisplayYUV420View.m */,
+				85F20A531CF83DAC009D472E /* RTCI420Frame.h */,
+				85F20A541CF83DAC009D472E /* RTCI420Frame.mm */,
 				85F20A291CF4581C009D472E /* FileOperator.h */,
 				85F20A2A1CF4581C009D472E /* FileOperator.m */,
 				856648FA1CA269000075FC36 /* Main.storyboard */,
@@ -207,7 +217,9 @@
 			files = (
 				856648F91CA269000075FC36 /* ViewController.m in Sources */,
 				85F20A2B1CF4581C009D472E /* FileOperator.m in Sources */,
+				85F20A521CF826D0009D472E /* GSOpenGLESDisplayYUV420View.m in Sources */,
 				85B169131CEC1AEA00DE9DFD /* GSOpenGLESView.m in Sources */,
+				85F20A551CF83DAC009D472E /* RTCI420Frame.mm in Sources */,
 				856648F61CA269000075FC36 /* AppDelegate.m in Sources */,
 				856648F31CA269000075FC36 /* main.m in Sources */,
 				85F20A2E1CF45C23009D472E /* BufferManager.m in Sources */,

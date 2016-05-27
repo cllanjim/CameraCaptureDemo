@@ -139,6 +139,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
             UInt8 * pFrameRGB = (UInt8 *)[data bytes];
             [displayView setVideoSize:VIDEO_WIDTH height:VIDEO_HEIGHT];
             [displayView displayYUV420pData:pFrameRGB width:VIDEO_WIDTH height:VIDEO_HEIGHT];
+            
+            [NSDate distantFuture];
         }
     });
 }
