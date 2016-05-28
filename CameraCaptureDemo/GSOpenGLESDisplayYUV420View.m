@@ -7,9 +7,11 @@
 //
 
 #import <GLKit/GLKit.h>
+#import <OpenGLES/ES3/gl.h>
 
 #import "GSOpenGLESDisplayYUV420View.h"
 #import "RTCI420Frame.h"
+#import "YUV420Data.h"
 
 // RTCDisplayLinkTimer wraps a CADisplayLink and is set to fire every two screen
 // refreshes, which should be 30fps. We wrap the display link in order to avoid
@@ -36,7 +38,7 @@
         _displayLink =
         [CADisplayLink displayLinkWithTarget:self
                                     selector:@selector(displayLinkDidFire:)];
-        _displayLink.paused = YES;
+//        _displayLink.paused = YES;
         // Set to half of screen refresh, which should be 30fps.
         [_displayLink setFrameInterval:2];
         [_displayLink addToRunLoop:[NSRunLoop currentRunLoop]
@@ -183,7 +185,7 @@ const GLfloat gVertices[] = {
 // of 3 textures are used here, one for each of the Y, U and V planes. Having
 // two sets alleviates CPU blockage in the event that the GPU is asked to render
 // to a texture that is already in use.
-static const GLsizei kNumTextureSets = 2;
+static const GLsizei kNumTextureSets = 1;
 static const GLsizei kNumTextures = 3 * kNumTextureSets;
 
 @interface GSOpenGLESDisplayYUV420View ()
@@ -197,6 +199,7 @@ GLKViewDelegate
     GLKView* _glkView;
     
     BOOL _isInitialized;
+    NSUInteger _currentTextureSet;
     
     GLuint _textures[kNumTextures];
     GLuint _program;
@@ -211,9 +214,11 @@ GLKViewDelegate
     GLint _vSampler;
     
     BOOL _isDirty;
+    
+    UInt8 *_planeBuffer;
 }
 
-@property(atomic, strong) RTCI420Frame* i420Frame;
+@property(atomic, strong) YUV420Data* i420Frame;
 
 @end
 
@@ -224,7 +229,7 @@ GLKViewDelegate
     self = [super initWithFrame:frame];
     if (self) {
         
-        if (!_isInitialized) {
+        if (_isInitialized) {
             return self;
         }
         
@@ -251,7 +256,7 @@ GLKViewDelegate
     return self;
 }
 
-- (BOOL)drawFrame:(RTCI420Frame*)frame {
+- (BOOL)drawFrame:(YUV420Data*)frame {
     if (!_isInitialized) {
         return NO;
     }
@@ -455,7 +460,7 @@ GLKViewDelegate
     //don't call display when no frame was received.
     //this fix the black screen problem.  https://bugzilla.grandstream.com/bugzilla/show_bug.cgi?id=60609
     if (self.i420Frame == nil) {
-        return;
+//        return;
     }
     
     // Always reset isDirty at this point, even if -[GLKView display]
@@ -471,12 +476,12 @@ GLKViewDelegate
     }
 }
 
-- (BOOL)updateTextureSizesForFrame:(RTCI420Frame*)frame {
+- (BOOL)updateTextureSizesForFrame:(YUV420Data*)frame {
     if (frame.height == _lastDrawnFrame.height &&
         frame.width == _lastDrawnFrame.width &&
         frame.chromaWidth == _lastDrawnFrame.chromaWidth &&
         frame.chromaHeight == _lastDrawnFrame.chromaHeight) {
-        return YES;
+//        return YES;
     }
     GLsizei lumaWidth = frame.width;
     GLsizei lumaHeight = frame.height;
@@ -516,9 +521,16 @@ GLKViewDelegate
     }
     if (frame.yPitch != frame.width || frame.uPitch != frame.chromaWidth ||
         frame.vPitch != frame.chromaWidth) {
-        _planeBuffer.reset(new uint8_t[frame.width * frame.height]);
+//        _planeBuffer.reset(new uint8_t[frame.width * frame.height]);
+//        if (!_planeBuffer) {
+            _planeBuffer = malloc(frame.width * frame.height);
+//        }
     } else {
-        _planeBuffer.reset();
+//        _planeBuffer.reset();
+        if (_planeBuffer) {
+            free(_planeBuffer);
+            _planeBuffer = nil;
+        }
     }
     return YES;
 }
@@ -534,7 +546,7 @@ GLKViewDelegate
     // the texture handle.
     glUniform1i(sampler, offset);
 #if TARGET_OS_IPHONE
-    BOOL hasUnpackRowLength = _context.API == kEAGLRenderingAPIOpenGLES3;
+    BOOL hasUnpackRowLength = _context.API == kEAGLRenderingAPIOpenGLES2;
 #else
     BOOL hasUnpackRowLength = YES;
 #endif
@@ -557,7 +569,7 @@ GLKViewDelegate
         } else {
             // Make an unpadded copy and upload that instead. Quick profiling showed
             // that this is faster than uploading row by row using glTexSubImage2D.
-            uint8_t* unpaddedPlane = _planeBuffer.get();
+            uint8_t* unpaddedPlane = _planeBuffer;//_planeBuffer.get();
             for (NSUInteger y = 0; y < height; ++y) {
                 memcpy(unpaddedPlane + y * width, plane + y * stride, width);
             }
@@ -575,7 +587,7 @@ GLKViewDelegate
                  uploadPlane);
 }
 
-- (BOOL)updateTextureDataForFrame:(RTCI420Frame*)frame {
+- (BOOL)updateTextureDataForFrame:(YUV420Data*)frame {
     NSUInteger textureOffset = _currentTextureSet * 3;
     NSAssert(textureOffset + 3 <= kNumTextures, @"invalid offset");
     

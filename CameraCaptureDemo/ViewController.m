@@ -20,6 +20,8 @@
 #import "GSOpenGLESView.h"
 #import "BufferManager.h"
 #import "OpenGLView20.h"
+#import "GSOpenGLESDisplayYUV420View.h"
+#import "YUV420Data.h"
 
 #define VIDEO_WIDTH 640
 #define VIDEO_HEIGHT 480
@@ -55,6 +57,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     
     dispatch_queue_t displayQueue;
     OpenGLView20 *displayView;
+    
+    GSOpenGLESDisplayYUV420View *yuv420DisplayView;
 }
 
 @end
@@ -81,8 +85,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
             break;
     }
     
-    GSOpenGLESView *glview = [[GSOpenGLESView alloc] initWithFrame:self.view.bounds];
-    [self.view addSubview:glview];
+//    GSOpenGLESView *glview = [[GSOpenGLESView alloc] initWithFrame:self.view.bounds];
+//    [self.view addSubview:glview];
     
     /*
      NSString *yuvFile = [[NSBundle mainBundle] pathForResource:@"jpgimage1_image_640_480" ofType:@"yuv"];
@@ -94,11 +98,20 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
      [myview displayYUV420pData:pFrameRGB width:640 height:480];
     */
     displayQueue = dispatch_queue_create("videoDisplay", DISPATCH_QUEUE_SERIAL);
-    displayView = [[OpenGLView20 alloc] initWithFrame:CGRectMake(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT)];
-    displayView.center = self.view.center;
-    displayView.transform = CGAffineTransformMakeScale(0.5f, 0.5f);
-    displayView.transform = CGAffineTransformRotate(displayView.transform, M_PI/2);
-    [self.view addSubview:displayView];
+//    displayView = [[OpenGLView20 alloc] initWithFrame:CGRectMake(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT)];
+//    displayView.center = self.view.center;
+//    displayView.transform = CGAffineTransformMakeScale(0.5f, 0.5f);
+//    displayView.transform = CGAffineTransformRotate(displayView.transform, M_PI/2);
+//    [self.view addSubview:displayView];
+    
+    
+    yuv420DisplayView = [[GSOpenGLESDisplayYUV420View alloc] initWithFrame:CGRectMake(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT)];
+    yuv420DisplayView.center = self.view.center;
+    yuv420DisplayView.transform = CGAffineTransformMakeScale(0.5f, 0.5f);
+//    yuv420DisplayView.transform = CGAffineTransformRotate(displayView.transform, M_PI/2);
+//    yuv420DisplayView.backgroundColor = [UIColor redColor];
+    [self.view addSubview:yuv420DisplayView];
+    
     [NSTimer scheduledTimerWithTimeInterval:frames/60 target:self selector:@selector(displayVideo) userInfo:nil repeats:YES];
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -136,11 +149,11 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     dispatch_async(displayQueue, ^{
         NSData *data = [yuv420Data getData];
         if (data) {
-            UInt8 * pFrameRGB = (UInt8 *)[data bytes];
-            [displayView setVideoSize:VIDEO_WIDTH height:VIDEO_HEIGHT];
-            [displayView displayYUV420pData:pFrameRGB width:VIDEO_WIDTH height:VIDEO_HEIGHT];
-            
-            [NSDate distantFuture];
+            UInt8 * videoFrame = (UInt8 *)[data bytes];
+//            [displayView setVideoSize:VIDEO_WIDTH height:VIDEO_HEIGHT];
+//            [displayView displayYUV420pData:videoFrame width:VIDEO_WIDTH height:VIDEO_HEIGHT];
+            YUV420Data *yuv = [[YUV420Data alloc] initWithYUV420Data:videoFrame Width:VIDEO_WIDTH Height:VIDEO_HEIGHT];
+            [yuv420DisplayView drawFrame:yuv];
         }
     });
 }

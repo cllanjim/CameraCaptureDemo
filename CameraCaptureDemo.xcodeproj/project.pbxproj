@@ -26,6 +26,8 @@
 		85F20A2E1CF45C23009D472E /* BufferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A2D1CF45C23009D472E /* BufferManager.m */; };
 		85F20A521CF826D0009D472E /* GSOpenGLESDisplayYUV420View.m in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A511CF826D0009D472E /* GSOpenGLESDisplayYUV420View.m */; };
 		85F20A551CF83DAC009D472E /* RTCI420Frame.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A541CF83DAC009D472E /* RTCI420Frame.mm */; };
+		85F20A581CF9982E009D472E /* YUV420Data.m in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A571CF9982E009D472E /* YUV420Data.m */; };
+		85F20A621CF9A0B6009D472E /* Fifo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A5C1CF9A0B6009D472E /* Fifo.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +60,15 @@
 		85F20A511CF826D0009D472E /* GSOpenGLESDisplayYUV420View.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GSOpenGLESDisplayYUV420View.m; sourceTree = "<group>"; };
 		85F20A531CF83DAC009D472E /* RTCI420Frame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTCI420Frame.h; sourceTree = "<group>"; };
 		85F20A541CF83DAC009D472E /* RTCI420Frame.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RTCI420Frame.mm; sourceTree = "<group>"; };
+		85F20A561CF9982E009D472E /* YUV420Data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YUV420Data.h; sourceTree = "<group>"; };
+		85F20A571CF9982E009D472E /* YUV420Data.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YUV420Data.m; sourceTree = "<group>"; };
+		85F20A5A1CF9A0B6009D472E /* DSVideoPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DSVideoPlayer.h; sourceTree = "<group>"; };
+		85F20A5B1CF9A0B6009D472E /* DSVideoPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DSVideoPlayer.m; sourceTree = "<group>"; };
+		85F20A5C1CF9A0B6009D472E /* Fifo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Fifo.cpp; sourceTree = "<group>"; };
+		85F20A5D1CF9A0B6009D472E /* Fifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Fifo.h; sourceTree = "<group>"; };
+		85F20A5E1CF9A0B6009D472E /* TbThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TbThread.cpp; sourceTree = "<group>"; };
+		85F20A5F1CF9A0B6009D472E /* TbThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TbThread.h; sourceTree = "<group>"; };
+		85F20A601CF9A0B6009D472E /* Utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utility.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,8 +121,11 @@
 				85F20A511CF826D0009D472E /* GSOpenGLESDisplayYUV420View.m */,
 				85F20A531CF83DAC009D472E /* RTCI420Frame.h */,
 				85F20A541CF83DAC009D472E /* RTCI420Frame.mm */,
+				85F20A561CF9982E009D472E /* YUV420Data.h */,
+				85F20A571CF9982E009D472E /* YUV420Data.m */,
 				85F20A291CF4581C009D472E /* FileOperator.h */,
 				85F20A2A1CF4581C009D472E /* FileOperator.m */,
+				85F20A591CF9A0B6009D472E /* FIFO */,
 				856648FA1CA269000075FC36 /* Main.storyboard */,
 				856648FD1CA269010075FC36 /* Assets.xcassets */,
 				856648FF1CA269010075FC36 /* LaunchScreen.storyboard */,
@@ -142,6 +156,20 @@
 				856649431CA3893D0075FC36 /* OpenGLES.framework */,
 			);
 			name = Framework;
+			sourceTree = "<group>";
+		};
+		85F20A591CF9A0B6009D472E /* FIFO */ = {
+			isa = PBXGroup;
+			children = (
+				85F20A5A1CF9A0B6009D472E /* DSVideoPlayer.h */,
+				85F20A5B1CF9A0B6009D472E /* DSVideoPlayer.m */,
+				85F20A5C1CF9A0B6009D472E /* Fifo.cpp */,
+				85F20A5D1CF9A0B6009D472E /* Fifo.h */,
+				85F20A5E1CF9A0B6009D472E /* TbThread.cpp */,
+				85F20A5F1CF9A0B6009D472E /* TbThread.h */,
+				85F20A601CF9A0B6009D472E /* Utility.h */,
+			);
+			path = FIFO;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -218,10 +246,12 @@
 				856648F91CA269000075FC36 /* ViewController.m in Sources */,
 				85F20A2B1CF4581C009D472E /* FileOperator.m in Sources */,
 				85F20A521CF826D0009D472E /* GSOpenGLESDisplayYUV420View.m in Sources */,
+				85F20A581CF9982E009D472E /* YUV420Data.m in Sources */,
 				85B169131CEC1AEA00DE9DFD /* GSOpenGLESView.m in Sources */,
 				85F20A551CF83DAC009D472E /* RTCI420Frame.mm in Sources */,
 				856648F61CA269000075FC36 /* AppDelegate.m in Sources */,
 				856648F31CA269000075FC36 /* main.m in Sources */,
+				85F20A621CF9A0B6009D472E /* Fifo.cpp in Sources */,
 				85F20A2E1CF45C23009D472E /* BufferManager.m in Sources */,
 				85B567F81CE2C4B100A80A5E /* OpenGLView20.m in Sources */,
 			);

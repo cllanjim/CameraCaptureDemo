@@ -8,11 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-@class RTCI420Frame;
+@class RTCI420Frame, YUV420Data;
 @interface GSOpenGLESDisplayYUV420View : UIView
 
 // The last successfully drawn frame. Used to avoid drawing frames unnecessarily
 // hence saving battery life by reducing load.
-@property(nonatomic, readonly) RTCI420Frame* lastDrawnFrame;
+@property(nonatomic, readonly) YUV420Data* lastDrawnFrame;
+
+- (BOOL)drawFrame:(YUV420Data*)frame;
 
 @end
