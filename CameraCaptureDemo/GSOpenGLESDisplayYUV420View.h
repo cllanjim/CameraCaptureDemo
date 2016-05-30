@@ -15,6 +15,6 @@
 // hence saving battery life by reducing load.
 @property(nonatomic, readonly) YUV420Data* lastDrawnFrame;
 
-- (BOOL)drawFrame:(YUV420Data*)frame;
+- (void)renderFrame:(YUV420Data *)frame;
 
 @end

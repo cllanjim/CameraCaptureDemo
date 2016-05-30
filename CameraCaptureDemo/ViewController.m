@@ -15,6 +15,8 @@
 #import <CoreImage/CoreImage.h>
 #import <AVKit/AVKit.h>
 
+#import "libyuv/libyuv.h"
+
 #import <AVFoundation/AVFoundation.h>
 
 #import "GSOpenGLESView.h"
@@ -108,8 +110,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     yuv420DisplayView = [[GSOpenGLESDisplayYUV420View alloc] initWithFrame:CGRectMake(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT)];
     yuv420DisplayView.center = self.view.center;
     yuv420DisplayView.transform = CGAffineTransformMakeScale(0.5f, 0.5f);
-//    yuv420DisplayView.transform = CGAffineTransformRotate(displayView.transform, M_PI/2);
-//    yuv420DisplayView.backgroundColor = [UIColor redColor];
+    yuv420DisplayView.transform = CGAffineTransformRotate(yuv420DisplayView.transform, M_PI/2);
     [self.view addSubview:yuv420DisplayView];
     
     [NSTimer scheduledTimerWithTimeInterval:frames/60 target:self selector:@selector(displayVideo) userInfo:nil repeats:YES];
@@ -153,7 +154,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 //            [displayView setVideoSize:VIDEO_WIDTH height:VIDEO_HEIGHT];
 //            [displayView displayYUV420pData:videoFrame width:VIDEO_WIDTH height:VIDEO_HEIGHT];
             YUV420Data *yuv = [[YUV420Data alloc] initWithYUV420Data:videoFrame Width:VIDEO_WIDTH Height:VIDEO_HEIGHT];
-            [yuv420DisplayView drawFrame:yuv];
+            [yuv420DisplayView renderFrame:yuv];
         }
     });
 }
@@ -358,30 +359,56 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
         size_t bytesrow0 = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer,0);
         size_t bytesrow1  = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer,1);
 //        size_t bytesrow2 = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer,2);
-        UInt8 *yuv420_data = (UInt8 *)malloc(width * height *3/ 2);//buffer to store YUV with layout YYYYYYYYUUVV
-        memset(yuv420_data, 0, width * height *3/ 2);
+//        UInt8 *yuv420_data = (UInt8 *)malloc(width * height *3/ 2);//buffer to store YUV with layout YYYYYYYYUUVV
+//        memset(yuv420_data, 0, width * height *3/ 2);
         
         /* convert NV21 data to YUV420*/
         
-        UInt8 *pY = bufferPtr ;
-        UInt8 *pUV = bufferPtr1;
-        UInt8 *pU = yuv420_data + width*height;
-        UInt8 *pV = pU + width*height/4;
-        for(int i =0;i<height;i++)
-        {
-            memcpy(yuv420_data+i*width,pY+i*bytesrow0,width);
-        }
-        for(int j = 0;j<height/2;j++)
-        {
-            for(int i =0;i<width/2;i++)
-            {
-                *(pU++) = pUV[i<<1];
-                *(pV++) = pUV[(i<<1) + 1];
-            }
-            pUV+=bytesrow1;
-        }
+        //
+        const int kYPlaneIndex = 0;
+        const int kUVPlaneIndex = 1;
+        size_t yPlaneBytesPerRow =
+        CVPixelBufferGetBytesPerRowOfPlane(imageBuffer, kYPlaneIndex);
+        size_t yPlaneHeight = CVPixelBufferGetHeightOfPlane(imageBuffer, kYPlaneIndex);
+        size_t uvPlaneBytesPerRow =
+        CVPixelBufferGetBytesPerRowOfPlane(imageBuffer, kUVPlaneIndex);
+        size_t uvPlaneHeight =
+        CVPixelBufferGetHeightOfPlane(imageBuffer, kUVPlaneIndex);
+        size_t frameSize =
+        yPlaneBytesPerRow * yPlaneHeight + uvPlaneBytesPerRow * uvPlaneHeight;
+        int stride_y = (int)width;
+        int stride_uv = ((int)width + 1) / 2;
+        int memmoryLength = stride_y * (int)height + (stride_uv + stride_uv) * (((int)height + 1) / 2);
+        UInt8 *yuv420_data = (UInt8 *)malloc(memmoryLength);//buffer to store YUV with layout YYYYYYYYUUVV
+        memset(yuv420_data, 0, memmoryLength);
+        
+        UInt8 *yBuffer = yuv420_data;
+        UInt8 *uBuffer = yBuffer + stride_y * height;
+        UInt8 *vBuffer = uBuffer + stride_uv * ((height + 1) / 2);
+        ConvertToI420(bufferPtr, frameSize, yBuffer, stride_y, uBuffer, stride_uv, vBuffer, stride_uv, 0, 0, (int)width, (int)height, (int)width, (int)height, kRotate0,
+                      FOURCC_NV12);
+        
+        
+//        UInt8 *pY = bufferPtr ;
+//        UInt8 *pUV = bufferPtr1;
+//        UInt8 *pU = yuv420_data + width*height;
+//        UInt8 *pV = pU + width*height/4;
+
+//        for(int i =0;i<height;i++)
+//        {
+//            memcpy(yuv420_data+i*width,pY+i*bytesrow0,width);
+//        }
+//        for(int j = 0;j<height/2;j++)
+//        {
+//            for(int i =0;i<width/2;i++)
+//            {
+//                *(pU++) = pUV[i<<1];
+//                *(pV++) = pUV[(i<<1) + 1];
+//            }
+//            pUV+=bytesrow1;
+//        }
         //add code to push yuv420_data to video encoder here
-        NSData *data = [NSData dataWithBytes:yuv420_data length:(width * height *3/ 2)];
+        NSData *data = [NSData dataWithBytes:yuv420_data length:memmoryLength];
         [yuv420Data addData:data];
         
         free(yuv420_data);

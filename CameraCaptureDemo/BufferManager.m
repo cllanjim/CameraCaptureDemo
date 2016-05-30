@@ -34,7 +34,7 @@
     [bufferLock lock];
     [dataArray addObject:data];
     
-//    if ([dataArray count] == 1) {
+//    if ([dataArray count] == 50) {
 //        FileOperator *file = [[FileOperator alloc] init];
 //        [file createFileWithName:@"datayun420"];
 //        [file fileWriterArray:dataArray];

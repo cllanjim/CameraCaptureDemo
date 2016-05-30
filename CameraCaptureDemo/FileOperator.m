@@ -39,7 +39,7 @@
 {
     FILE *file = fopen([fullPath UTF8String], "wb");
     for (NSData *d in arrayData) {
-        fwrite([d bytes], 352*288*3/2, 1, file);
+        fwrite([d bytes], 640*480*3/2, 1, file);
     }
     fclose(file);
     

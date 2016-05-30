@@ -40,7 +40,7 @@
                                     selector:@selector(displayLinkDidFire:)];
 //        _displayLink.paused = YES;
         // Set to half of screen refresh, which should be 30fps.
-        [_displayLink setFrameInterval:2];
+        [_displayLink setFrameInterval:6];
         [_displayLink addToRunLoop:[NSRunLoop currentRunLoop]
                            forMode:NSRunLoopCommonModes];
     }
@@ -256,31 +256,9 @@ GLKViewDelegate
     return self;
 }
 
-- (BOOL)drawFrame:(YUV420Data*)frame {
-    if (!_isInitialized) {
-        return NO;
-    }
-    if (_lastDrawnFrame == frame) {
-        return NO;
-    }
-    [self ensureGLContext];
-    glClear(GL_COLOR_BUFFER_BIT);
-    if (frame) {
-        if (![self updateTextureSizesForFrame:frame] ||
-            ![self updateTextureDataForFrame:frame]) {
-            return NO;
-        }
-#if !TARGET_OS_IPHONE
-        glBindVertexArray(_vertexArray);
-#endif
-        glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-    }
-#if !TARGET_OS_IPHONE
-    [_context flushBuffer];
-#endif
-    _lastDrawnFrame = frame;
-    return YES;
+- (void)renderFrame:(YUV420Data *)frame
+{
+    self.i420Frame = frame;
 }
 
 - (void)teardownGL {
@@ -454,7 +432,7 @@ GLKViewDelegate
     // Don't render unless video frame have changed or the view content
     // has explicitly been marked dirty.
     if (!_isDirty && self.lastDrawnFrame == self.i420Frame) {
-        return;
+//        return;
     }
     
     //don't call display when no frame was received.
@@ -474,6 +452,33 @@ GLKViewDelegate
     if (self.bounds.size.width > 0 && self.bounds.size.height > 0) {
         [_glkView display];
     }
+}
+
+- (BOOL)drawFrame:(YUV420Data *)frame {
+    if (!_isInitialized) {
+        return NO;
+    }
+    if (_lastDrawnFrame == frame) {
+        //        return NO;
+    }
+    [self ensureGLContext];
+    glClear(GL_COLOR_BUFFER_BIT);
+    if (frame) {
+        if (![self updateTextureSizesForFrame:frame] ||
+            ![self updateTextureDataForFrame:frame]) {
+            return NO;
+        }
+#if !TARGET_OS_IPHONE
+        glBindVertexArray(_vertexArray);
+#endif
+        glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    }
+#if !TARGET_OS_IPHONE
+    [_context flushBuffer];
+#endif
+    _lastDrawnFrame = frame;
+    return YES;
 }
 
 - (BOOL)updateTextureSizesForFrame:(YUV420Data*)frame {
