@@ -7,6 +7,7 @@
 //
 
 #import "YUV420Data.h"
+#import "FileOperator.h"
 
 @interface YUV420Data ()
 {
@@ -31,6 +32,13 @@
 {
     self = [super init];
     if (self) {
+        
+//        static int i = 0;
+//        if (i > 0) {
+//            return self;
+//        }
+//        i++;
+        
         yuv = malloc(width * height * 3 / 2);
         if (!yuv) {
             NSLog(@"error");
@@ -47,8 +55,8 @@
 //        const UInt8* buffer_u = buffer_y + stride_y * height;
 //        const UInt8* buffer_v = buffer_u + stride_uv * ((height + 1) / 2);
         
-        self.chromaWidth = (2 + 1)/2;
-        self.chromaHeight = (2 +1)/2;
+        self.chromaWidth = (width + 1)/2;
+        self.chromaHeight = (height +1)/2;
         
         self.yPlane = yuv;
         self.uPlane = self.yPlane + stride_y * height;
@@ -56,6 +64,10 @@
         
         self.yPitch = stride_y;
         self.uPitch = self.vPitch = stride_uv;
+        
+//        FileOperator *file = [[FileOperator alloc] init];
+//        [file createFileWithName:@"datayun420oneFrame"];
+//        [file fileWriterData:yuv];
     }
     
     return self;

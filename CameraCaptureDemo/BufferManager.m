@@ -31,7 +31,7 @@
 
 - (void)addData:(NSData *)data
 {
-    [bufferLock lock];
+//    [bufferLock lock];
     [dataArray addObject:data];
     
 //    if ([dataArray count] == 50) {
@@ -40,17 +40,17 @@
 //        [file fileWriterArray:dataArray];
 //    }
     
-    [bufferLock unlock];
+//    [bufferLock unlock];
 }
 - (NSData *)getData
 {
-    [bufferLock lock];
+//    [bufferLock lock];
     NSData *data = nil;
     if (0 < [dataArray count]) {
         data = [dataArray objectAtIndex:0];
         [dataArray removeObject:data];
     }
-    [bufferLock unlock];
+//    [bufferLock unlock];
     
     return data;
 }

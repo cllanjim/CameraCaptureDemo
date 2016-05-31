@@ -98,8 +98,8 @@ static uvec16 kScaleAb2 =
 // Generated using gcc disassembly on Visual C object file:
 // objdump -D yuvscaler.obj >yuvscaler.txt
 
-void ScaleRowDown2_SSE2(const uint8* src_ptr, ptrdiff_t src_stride,
-                        uint8* dst_ptr, int dst_width) {
+void ScaleRowDown2_SSSE3(const uint8* src_ptr, ptrdiff_t src_stride,
+                         uint8* dst_ptr, int dst_width) {
   asm volatile (
     LABELALIGN
   "1:                                          \n"
@@ -120,26 +120,24 @@ void ScaleRowDown2_SSE2(const uint8* src_ptr, ptrdiff_t src_stride,
   );
 }
 
-void ScaleRowDown2Linear_SSE2(const uint8* src_ptr, ptrdiff_t src_stride,
-                              uint8* dst_ptr, int dst_width) {
+void ScaleRowDown2Linear_SSSE3(const uint8* src_ptr, ptrdiff_t src_stride,
+                               uint8* dst_ptr, int dst_width) {
   asm volatile (
-    "pcmpeqb   %%xmm5,%%xmm5                   \n"
-    "psrlw     $0x8,%%xmm5                     \n"
+    "pcmpeqb    %%xmm4,%%xmm4                  \n"
+    "psrlw      $0xf,%%xmm4                    \n"
+    "packuswb   %%xmm4,%%xmm4                  \n"
+    "pxor       %%xmm5,%%xmm5                  \n"
 
     LABELALIGN
   "1:                                          \n"
     "movdqu    " MEMACCESS(0) ",%%xmm0         \n"
     "movdqu    " MEMACCESS2(0x10, 0) ",%%xmm1  \n"
     "lea       " MEMLEA(0x20,0) ",%0           \n"
-    "movdqa    %%xmm0,%%xmm2                   \n"
-    "psrlw     $0x8,%%xmm0                     \n"
-    "movdqa    %%xmm1,%%xmm3                   \n"
-    "psrlw     $0x8,%%xmm1                     \n"
-    "pand      %%xmm5,%%xmm2                   \n"
-    "pand      %%xmm5,%%xmm3                   \n"
-    "pavgw     %%xmm2,%%xmm0                   \n"
-    "pavgw     %%xmm3,%%xmm1                   \n"
-    "packuswb  %%xmm1,%%xmm0                   \n"
+    "pmaddubsw  %%xmm4,%%xmm0                  \n"
+    "pmaddubsw  %%xmm4,%%xmm1                  \n"
+    "pavgw      %%xmm5,%%xmm0                  \n"
+    "pavgw      %%xmm5,%%xmm1                  \n"
+    "packuswb   %%xmm1,%%xmm0                  \n"
     "movdqu    %%xmm0," MEMACCESS(1) "         \n"
     "lea       " MEMLEA(0x10,1) ",%1           \n"
     "sub       $0x10,%2                        \n"
@@ -147,15 +145,17 @@ void ScaleRowDown2Linear_SSE2(const uint8* src_ptr, ptrdiff_t src_stride,
   : "+r"(src_ptr),    // %0
     "+r"(dst_ptr),    // %1
     "+r"(dst_width)   // %2
-  :: "memory", "cc", "xmm0", "xmm1", "xmm5"
+  :: "memory", "cc", "xmm0", "xmm1", "xmm4", "xmm5"
   );
 }
 
-void ScaleRowDown2Box_SSE2(const uint8* src_ptr, ptrdiff_t src_stride,
-                           uint8* dst_ptr, int dst_width) {
+void ScaleRowDown2Box_SSSE3(const uint8* src_ptr, ptrdiff_t src_stride,
+                            uint8* dst_ptr, int dst_width) {
   asm volatile (
-    "pcmpeqb   %%xmm5,%%xmm5                   \n"
-    "psrlw     $0x8,%%xmm5                     \n"
+    "pcmpeqb    %%xmm4,%%xmm4                  \n"
+    "psrlw      $0xf,%%xmm4                    \n"
+    "packuswb   %%xmm4,%%xmm4                  \n"
+    "pxor       %%xmm5,%%xmm5                  \n"
 
     LABELALIGN
   "1:                                          \n"
@@ -164,17 +164,17 @@ void ScaleRowDown2Box_SSE2(const uint8* src_ptr, ptrdiff_t src_stride,
     MEMOPREG(movdqu,0x00,0,3,1,xmm2)           //  movdqu  (%0,%3,1),%%xmm2
     MEMOPREG(movdqu,0x10,0,3,1,xmm3)           //  movdqu  0x10(%0,%3,1),%%xmm3
     "lea       " MEMLEA(0x20,0) ",%0           \n"
-    "pavgb     %%xmm2,%%xmm0                   \n"
-    "pavgb     %%xmm3,%%xmm1                   \n"
-    "movdqa    %%xmm0,%%xmm2                   \n"
-    "psrlw     $0x8,%%xmm0                     \n"
-    "movdqa    %%xmm1,%%xmm3                   \n"
-    "psrlw     $0x8,%%xmm1                     \n"
-    "pand      %%xmm5,%%xmm2                   \n"
-    "pand      %%xmm5,%%xmm3                   \n"
-    "pavgw     %%xmm2,%%xmm0                   \n"
-    "pavgw     %%xmm3,%%xmm1                   \n"
-    "packuswb  %%xmm1,%%xmm0                   \n"
+    "pmaddubsw  %%xmm4,%%xmm0                  \n"
+    "pmaddubsw  %%xmm4,%%xmm1                  \n"
+    "pmaddubsw  %%xmm4,%%xmm2                  \n"
+    "pmaddubsw  %%xmm4,%%xmm3                  \n"
+    "paddw      %%xmm2,%%xmm0                  \n"
+    "paddw      %%xmm3,%%xmm1                  \n"
+    "psrlw      $0x1,%%xmm0                    \n"
+    "psrlw      $0x1,%%xmm1                    \n"
+    "pavgw      %%xmm5,%%xmm0                  \n"
+    "pavgw      %%xmm5,%%xmm1                  \n"
+    "packuswb   %%xmm1,%%xmm0                  \n"
     "movdqu    %%xmm0," MEMACCESS(1) "         \n"
     "lea       " MEMLEA(0x10,1) ",%1           \n"
     "sub       $0x10,%2                        \n"
@@ -188,7 +188,105 @@ void ScaleRowDown2Box_SSE2(const uint8* src_ptr, ptrdiff_t src_stride,
   );
 }
 
-void ScaleRowDown4_SSE2(const uint8* src_ptr, ptrdiff_t src_stride,
+#ifdef HAS_SCALEROWDOWN2_AVX2
+void ScaleRowDown2_AVX2(const uint8* src_ptr, ptrdiff_t src_stride,
+                        uint8* dst_ptr, int dst_width) {
+  asm volatile (
+    LABELALIGN
+  "1:                                          \n"
+    "vmovdqu    " MEMACCESS(0) ",%%ymm0        \n"
+    "vmovdqu    " MEMACCESS2(0x20,0) ",%%ymm1  \n"
+    "lea        " MEMLEA(0x40,0) ",%0          \n"
+    "vpsrlw     $0x8,%%ymm0,%%ymm0             \n"
+    "vpsrlw     $0x8,%%ymm1,%%ymm1             \n"
+    "vpackuswb  %%ymm1,%%ymm0,%%ymm0           \n"
+    "vpermq     $0xd8,%%ymm0,%%ymm0            \n"
+    "vmovdqu    %%ymm0," MEMACCESS(1) "        \n"
+    "lea        " MEMLEA(0x20,1) ",%1          \n"
+    "sub        $0x20,%2                       \n"
+    "jg         1b                             \n"
+    "vzeroupper                                \n"
+  : "+r"(src_ptr),    // %0
+    "+r"(dst_ptr),    // %1
+    "+r"(dst_width)   // %2
+  :: "memory", "cc", "xmm0", "xmm1"
+  );
+}
+
+void ScaleRowDown2Linear_AVX2(const uint8* src_ptr, ptrdiff_t src_stride,
+                              uint8* dst_ptr, int dst_width) {
+  asm volatile (
+    "vpcmpeqb   %%ymm4,%%ymm4,%%ymm4           \n"
+    "vpsrlw     $0xf,%%ymm4,%%ymm4             \n"
+    "vpackuswb  %%ymm4,%%ymm4,%%ymm4           \n"
+    "vpxor      %%ymm5,%%ymm5,%%ymm5           \n"
+
+    LABELALIGN
+  "1:                                          \n"
+    "vmovdqu    " MEMACCESS(0) ",%%ymm0        \n"
+    "vmovdqu    " MEMACCESS2(0x20, 0) ",%%ymm1 \n"
+    "lea        " MEMLEA(0x40,0) ",%0          \n"
+    "vpmaddubsw %%ymm4,%%ymm0,%%ymm0           \n"
+    "vpmaddubsw %%ymm4,%%ymm1,%%ymm1           \n"
+    "vpavgw     %%ymm5,%%ymm0,%%ymm0           \n"
+    "vpavgw     %%ymm5,%%ymm1,%%ymm1           \n"
+    "vpackuswb  %%ymm1,%%ymm0,%%ymm0           \n"
+    "vpermq     $0xd8,%%ymm0,%%ymm0            \n"
+    "vmovdqu    %%ymm0," MEMACCESS(1) "        \n"
+    "lea        " MEMLEA(0x20,1) ",%1          \n"
+    "sub        $0x20,%2                       \n"
+    "jg         1b                             \n"
+    "vzeroupper                                \n"
+  : "+r"(src_ptr),    // %0
+    "+r"(dst_ptr),    // %1
+    "+r"(dst_width)   // %2
+  :: "memory", "cc", "xmm0", "xmm1", "xmm4", "xmm5"
+  );
+}
+
+void ScaleRowDown2Box_AVX2(const uint8* src_ptr, ptrdiff_t src_stride,
+                           uint8* dst_ptr, int dst_width) {
+  asm volatile (
+    "vpcmpeqb   %%ymm4,%%ymm4,%%ymm4           \n"
+    "vpsrlw     $0xf,%%ymm4,%%ymm4             \n"
+    "vpackuswb  %%ymm4,%%ymm4,%%ymm4           \n"
+    "vpxor      %%ymm5,%%ymm5,%%ymm5           \n"
+
+    LABELALIGN
+  "1:                                          \n"
+    "vmovdqu    " MEMACCESS(0) ",%%ymm0        \n"
+    "vmovdqu    " MEMACCESS2(0x20,0) ",%%ymm1  \n"
+    MEMOPREG(vmovdqu,0x00,0,3,1,ymm2)          //  vmovdqu  (%0,%3,1),%%ymm2
+    MEMOPREG(vmovdqu,0x20,0,3,1,ymm3)          //  vmovdqu  0x20(%0,%3,1),%%ymm3
+    "lea        " MEMLEA(0x40,0) ",%0          \n"
+    "vpmaddubsw %%ymm4,%%ymm0,%%ymm0           \n"
+    "vpmaddubsw %%ymm4,%%ymm1,%%ymm1           \n"
+    "vpmaddubsw %%ymm4,%%ymm2,%%ymm2           \n"
+    "vpmaddubsw %%ymm4,%%ymm3,%%ymm3           \n"
+    "vpaddw     %%ymm2,%%ymm0,%%ymm0           \n"
+    "vpaddw     %%ymm3,%%ymm1,%%ymm1           \n"
+    "vpsrlw     $0x1,%%ymm0,%%ymm0             \n"
+    "vpsrlw     $0x1,%%ymm1,%%ymm1             \n"
+    "vpavgw     %%ymm5,%%ymm0,%%ymm0           \n"
+    "vpavgw     %%ymm5,%%ymm1,%%ymm1           \n"
+    "vpackuswb  %%ymm1,%%ymm0,%%ymm0           \n"
+    "vpermq     $0xd8,%%ymm0,%%ymm0            \n"
+    "vmovdqu    %%ymm0," MEMACCESS(1) "        \n"
+    "lea        " MEMLEA(0x20,1) ",%1          \n"
+    "sub        $0x20,%2                       \n"
+    "jg         1b                             \n"
+    "vzeroupper                                \n"
+  : "+r"(src_ptr),    // %0
+    "+r"(dst_ptr),    // %1
+    "+r"(dst_width)   // %2
+  : "r"((intptr_t)(src_stride))   // %3
+  : "memory", "cc", NACL_R14
+    "xmm0", "xmm1", "xmm2", "xmm3", "xmm5"
+  );
+}
+#endif  // HAS_SCALEROWDOWN2_AVX2
+
+void ScaleRowDown4_SSSE3(const uint8* src_ptr, ptrdiff_t src_stride,
                         uint8* dst_ptr, int dst_width) {
   asm volatile (
     "pcmpeqb   %%xmm5,%%xmm5                   \n"
@@ -216,12 +314,15 @@ void ScaleRowDown4_SSE2(const uint8* src_ptr, ptrdiff_t src_stride,
   );
 }
 
-void ScaleRowDown4Box_SSE2(const uint8* src_ptr, ptrdiff_t src_stride,
+void ScaleRowDown4Box_SSSE3(const uint8* src_ptr, ptrdiff_t src_stride,
                            uint8* dst_ptr, int dst_width) {
-  intptr_t stridex3 = 0;
+  intptr_t stridex3;
   asm volatile (
-    "pcmpeqb   %%xmm7,%%xmm7                   \n"
-    "psrlw     $0x8,%%xmm7                     \n"
+    "pcmpeqb    %%xmm4,%%xmm4                  \n"
+    "psrlw      $0xf,%%xmm4                    \n"
+    "movdqa     %%xmm4,%%xmm5                  \n"
+    "packuswb   %%xmm4,%%xmm4                  \n"
+    "psllw      $0x3,%%xmm5                    \n"
     "lea       " MEMLEA4(0x00,4,4,2) ",%3      \n"
 
     LABELALIGN
@@ -230,31 +331,29 @@ void ScaleRowDown4Box_SSE2(const uint8* src_ptr, ptrdiff_t src_stride,
     "movdqu    " MEMACCESS2(0x10,0) ",%%xmm1   \n"
     MEMOPREG(movdqu,0x00,0,4,1,xmm2)           //  movdqu  (%0,%4,1),%%xmm2
     MEMOPREG(movdqu,0x10,0,4,1,xmm3)           //  movdqu  0x10(%0,%4,1),%%xmm3
-    "pavgb     %%xmm2,%%xmm0                   \n"
-    "pavgb     %%xmm3,%%xmm1                   \n"
+    "pmaddubsw  %%xmm4,%%xmm0                  \n"
+    "pmaddubsw  %%xmm4,%%xmm1                  \n"
+    "pmaddubsw  %%xmm4,%%xmm2                  \n"
+    "pmaddubsw  %%xmm4,%%xmm3                  \n"
+    "paddw      %%xmm2,%%xmm0                  \n"
+    "paddw      %%xmm3,%%xmm1                  \n"
     MEMOPREG(movdqu,0x00,0,4,2,xmm2)           //  movdqu  (%0,%4,2),%%xmm2
     MEMOPREG(movdqu,0x10,0,4,2,xmm3)           //  movdqu  0x10(%0,%4,2),%%xmm3
-    MEMOPREG(movdqu,0x00,0,3,1,xmm4)           //  movdqu  (%0,%3,1),%%xmm4
-    MEMOPREG(movdqu,0x10,0,3,1,xmm5)           //  movdqu  0x10(%0,%3,1),%%xmm5
+    "pmaddubsw  %%xmm4,%%xmm2                  \n"
+    "pmaddubsw  %%xmm4,%%xmm3                  \n"
+    "paddw      %%xmm2,%%xmm0                  \n"
+    "paddw      %%xmm3,%%xmm1                  \n"
+    MEMOPREG(movdqu,0x00,0,3,1,xmm2)           //  movdqu  (%0,%3,1),%%xmm2
+    MEMOPREG(movdqu,0x10,0,3,1,xmm3)           //  movdqu  0x10(%0,%3,1),%%xmm3
     "lea       " MEMLEA(0x20,0) ",%0           \n"
-    "pavgb     %%xmm4,%%xmm2                   \n"
-    "pavgb     %%xmm2,%%xmm0                   \n"
-    "pavgb     %%xmm5,%%xmm3                   \n"
-    "pavgb     %%xmm3,%%xmm1                   \n"
-    "movdqa    %%xmm0,%%xmm2                   \n"
-    "psrlw     $0x8,%%xmm0                     \n"
-    "movdqa    %%xmm1,%%xmm3                   \n"
-    "psrlw     $0x8,%%xmm1                     \n"
-    "pand      %%xmm7,%%xmm2                   \n"
-    "pand      %%xmm7,%%xmm3                   \n"
-    "pavgw     %%xmm2,%%xmm0                   \n"
-    "pavgw     %%xmm3,%%xmm1                   \n"
-    "packuswb  %%xmm1,%%xmm0                   \n"
-    "movdqa    %%xmm0,%%xmm2                   \n"
-    "psrlw     $0x8,%%xmm0                     \n"
-    "pand      %%xmm7,%%xmm2                   \n"
-    "pavgw     %%xmm2,%%xmm0                   \n"
-    "packuswb  %%xmm0,%%xmm0                   \n"
+    "pmaddubsw  %%xmm4,%%xmm2                  \n"
+    "pmaddubsw  %%xmm4,%%xmm3                  \n"
+    "paddw      %%xmm2,%%xmm0                  \n"
+    "paddw      %%xmm3,%%xmm1                  \n"
+    "phaddw     %%xmm1,%%xmm0                  \n"
+    "paddw      %%xmm5,%%xmm0                  \n"
+    "psrlw      $0x4,%%xmm0                    \n"
+    "packuswb   %%xmm0,%%xmm0                  \n"
     "movq      %%xmm0," MEMACCESS(1) "         \n"
     "lea       " MEMLEA(0x8,1) ",%1            \n"
     "sub       $0x8,%2                         \n"
@@ -262,12 +361,99 @@ void ScaleRowDown4Box_SSE2(const uint8* src_ptr, ptrdiff_t src_stride,
   : "+r"(src_ptr),     // %0
     "+r"(dst_ptr),     // %1
     "+r"(dst_width),   // %2
-    "+r"(stridex3)     // %3
+    "=&r"(stridex3)    // %3
   : "r"((intptr_t)(src_stride))    // %4
   : "memory", "cc", NACL_R14
-    "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm7"
+    "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5"
   );
 }
+
+
+#ifdef HAS_SCALEROWDOWN4_AVX2
+void ScaleRowDown4_AVX2(const uint8* src_ptr, ptrdiff_t src_stride,
+                        uint8* dst_ptr, int dst_width) {
+  asm volatile (
+    "vpcmpeqb   %%ymm5,%%ymm5,%%ymm5           \n"
+    "vpsrld     $0x18,%%ymm5,%%ymm5            \n"
+    "vpslld     $0x10,%%ymm5,%%ymm5            \n"
+    LABELALIGN
+  "1:                                          \n"
+    "vmovdqu    " MEMACCESS(0) ",%%ymm0        \n"
+    "vmovdqu    " MEMACCESS2(0x20,0) ",%%ymm1  \n"
+    "lea        " MEMLEA(0x40,0) ",%0          \n"
+    "vpand      %%ymm5,%%ymm0,%%ymm0           \n"
+    "vpand      %%ymm5,%%ymm1,%%ymm1           \n"
+    "vpackuswb  %%ymm1,%%ymm0,%%ymm0           \n"
+    "vpermq     $0xd8,%%ymm0,%%ymm0            \n"
+    "vpsrlw     $0x8,%%ymm0,%%ymm0             \n"
+    "vpackuswb  %%ymm0,%%ymm0,%%ymm0           \n"
+    "vpermq     $0xd8,%%ymm0,%%ymm0            \n"
+    "vmovdqu    %%xmm0," MEMACCESS(1) "        \n"
+    "lea        " MEMLEA(0x10,1) ",%1          \n"
+    "sub        $0x10,%2                       \n"
+    "jg         1b                             \n"
+    "vzeroupper                                \n"
+  : "+r"(src_ptr),    // %0
+    "+r"(dst_ptr),    // %1
+    "+r"(dst_width)   // %2
+  :: "memory", "cc", "xmm0", "xmm1", "xmm5"
+  );
+}
+
+void ScaleRowDown4Box_AVX2(const uint8* src_ptr, ptrdiff_t src_stride,
+                           uint8* dst_ptr, int dst_width) {
+  asm volatile (
+    "vpcmpeqb   %%ymm4,%%ymm4,%%ymm4           \n"
+    "vpsrlw     $0xf,%%ymm4,%%ymm4             \n"
+    "vpsllw     $0x3,%%ymm4,%%ymm5             \n"
+    "vpackuswb  %%ymm4,%%ymm4,%%ymm4           \n"
+
+    LABELALIGN
+  "1:                                          \n"
+    "vmovdqu    " MEMACCESS(0) ",%%ymm0        \n"
+    "vmovdqu    " MEMACCESS2(0x20,0) ",%%ymm1  \n"
+    MEMOPREG(vmovdqu,0x00,0,3,1,ymm2)          //  vmovdqu  (%0,%3,1),%%ymm2
+    MEMOPREG(vmovdqu,0x20,0,3,1,ymm3)          //  vmovdqu  0x20(%0,%3,1),%%ymm3
+    "vpmaddubsw %%ymm4,%%ymm0,%%ymm0           \n"
+    "vpmaddubsw %%ymm4,%%ymm1,%%ymm1           \n"
+    "vpmaddubsw %%ymm4,%%ymm2,%%ymm2           \n"
+    "vpmaddubsw %%ymm4,%%ymm3,%%ymm3           \n"
+    "vpaddw     %%ymm2,%%ymm0,%%ymm0           \n"
+    "vpaddw     %%ymm3,%%ymm1,%%ymm1           \n"
+    MEMOPREG(vmovdqu,0x00,0,3,2,ymm2)          //  vmovdqu  (%0,%3,2),%%ymm2
+    MEMOPREG(vmovdqu,0x20,0,3,2,ymm3)          //  vmovdqu  0x20(%0,%3,2),%%ymm3
+    "vpmaddubsw %%ymm4,%%ymm2,%%ymm2           \n"
+    "vpmaddubsw %%ymm4,%%ymm3,%%ymm3           \n"
+    "vpaddw     %%ymm2,%%ymm0,%%ymm0           \n"
+    "vpaddw     %%ymm3,%%ymm1,%%ymm1           \n"
+    MEMOPREG(vmovdqu,0x00,0,4,1,ymm2)          //  vmovdqu  (%0,%4,1),%%ymm2
+    MEMOPREG(vmovdqu,0x20,0,4,1,ymm3)          //  vmovdqu  0x20(%0,%4,1),%%ymm3
+    "lea        " MEMLEA(0x40,0) ",%0          \n"
+    "vpmaddubsw %%ymm4,%%ymm2,%%ymm2           \n"
+    "vpmaddubsw %%ymm4,%%ymm3,%%ymm3           \n"
+    "vpaddw     %%ymm2,%%ymm0,%%ymm0           \n"
+    "vpaddw     %%ymm3,%%ymm1,%%ymm1           \n"
+    "vphaddw    %%ymm1,%%ymm0,%%ymm0           \n"
+    "vpermq     $0xd8,%%ymm0,%%ymm0            \n"
+    "vpaddw     %%ymm5,%%ymm0,%%ymm0           \n"
+    "vpsrlw     $0x4,%%ymm0,%%ymm0             \n"
+    "vpackuswb  %%ymm0,%%ymm0,%%ymm0           \n"
+    "vpermq     $0xd8,%%ymm0,%%ymm0            \n"
+    "vmovdqu    %%xmm0," MEMACCESS(1) "        \n"
+    "lea        " MEMLEA(0x10,1) ",%1          \n"
+    "sub        $0x10,%2                       \n"
+    "jg         1b                             \n"
+    "vzeroupper                                \n"
+  : "+r"(src_ptr),    // %0
+    "+r"(dst_ptr),    // %1
+    "+r"(dst_width)   // %2
+  : "r"((intptr_t)(src_stride)),  // %3
+    "r"((intptr_t)(src_stride * 3))   // %4
+  : "memory", "cc", NACL_R14
+    "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5"
+  );
+}
+#endif  // HAS_SCALEROWDOWN4_AVX2
 
 void ScaleRowDown34_SSSE3(const uint8* src_ptr, ptrdiff_t src_stride,
                           uint8* dst_ptr, int dst_width) {
@@ -638,7 +824,7 @@ void ScaleAddRow_AVX2(const uint8* src_ptr, uint16* dst_ptr, int src_width) {
 // Bilinear column filtering. SSSE3 version.
 void ScaleFilterCols_SSSE3(uint8* dst_ptr, const uint8* src_ptr,
                            int dst_width, int x, int dx) {
-  intptr_t x0 = 0, x1 = 0, temp_pixel = 0;
+  intptr_t x0, x1, temp_pixel;
   asm volatile (
     "movd      %6,%%xmm2                       \n"
     "movd      %7,%%xmm3                       \n"
@@ -694,14 +880,14 @@ void ScaleFilterCols_SSSE3(uint8* dst_ptr, const uint8* src_ptr,
     "movd      %%xmm0,%k2                      \n"
     "mov       %b2," MEMACCESS(0) "            \n"
   "99:                                         \n"
-  : "+r"(dst_ptr),     // %0
-    "+r"(src_ptr),     // %1
-    "+a"(temp_pixel),  // %2
-    "+r"(x0),          // %3
-    "+r"(x1),          // %4
-    "+rm"(dst_width)   // %5
-  : "rm"(x),           // %6
-    "rm"(dx)           // %7
+  : "+r"(dst_ptr),      // %0
+    "+r"(src_ptr),      // %1
+    "=&a"(temp_pixel),  // %2
+    "=&r"(x0),          // %3
+    "=&r"(x1),          // %4
+    "+rm"(dst_width)    // %5
+  : "rm"(x),            // %6
+    "rm"(dx)            // %7
   : "memory", "cc", NACL_R14
     "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6"
   );
@@ -812,7 +998,7 @@ void ScaleARGBRowDown2Box_SSE2(const uint8* src_argb,
 void ScaleARGBRowDownEven_SSE2(const uint8* src_argb, ptrdiff_t src_stride,
                                int src_stepx, uint8* dst_argb, int dst_width) {
   intptr_t src_stepx_x4 = (intptr_t)(src_stepx);
-  intptr_t src_stepx_x12 = 0;
+  intptr_t src_stepx_x12;
   asm volatile (
     "lea       " MEMLEA3(0x00,1,4) ",%1        \n"
     "lea       " MEMLEA4(0x00,1,1,2) ",%4      \n"
@@ -830,11 +1016,11 @@ void ScaleARGBRowDownEven_SSE2(const uint8* src_argb, ptrdiff_t src_stride,
     "lea       " MEMLEA(0x10,2) ",%2           \n"
     "sub       $0x4,%3                         \n"
     "jg        1b                              \n"
-  : "+r"(src_argb),      // %0
-    "+r"(src_stepx_x4),  // %1
-    "+r"(dst_argb),      // %2
-    "+r"(dst_width),     // %3
-    "+r"(src_stepx_x12)  // %4
+  : "+r"(src_argb),       // %0
+    "+r"(src_stepx_x4),   // %1
+    "+r"(dst_argb),       // %2
+    "+r"(dst_width),      // %3
+    "=&r"(src_stepx_x12)  // %4
   :: "memory", "cc", NACL_R14
     "xmm0", "xmm1", "xmm2", "xmm3"
   );
@@ -846,7 +1032,7 @@ void ScaleARGBRowDownEvenBox_SSE2(const uint8* src_argb,
                                   ptrdiff_t src_stride, int src_stepx,
                                   uint8* dst_argb, int dst_width) {
   intptr_t src_stepx_x4 = (intptr_t)(src_stepx);
-  intptr_t src_stepx_x12 = 0;
+  intptr_t src_stepx_x12;
   intptr_t row1 = (intptr_t)(src_stride);
   asm volatile (
     "lea       " MEMLEA3(0x00,1,4) ",%1        \n"
@@ -875,12 +1061,12 @@ void ScaleARGBRowDownEvenBox_SSE2(const uint8* src_argb,
     "lea       " MEMLEA(0x10,2) ",%2           \n"
     "sub       $0x4,%3                         \n"
     "jg        1b                              \n"
-  : "+r"(src_argb),       // %0
-    "+r"(src_stepx_x4),   // %1
-    "+r"(dst_argb),       // %2
-    "+rm"(dst_width),     // %3
-    "+r"(src_stepx_x12),  // %4
-    "+r"(row1)            // %5
+  : "+r"(src_argb),        // %0
+    "+r"(src_stepx_x4),    // %1
+    "+r"(dst_argb),        // %2
+    "+rm"(dst_width),      // %3
+    "=&r"(src_stepx_x12),  // %4
+    "+r"(row1)             // %5
   :: "memory", "cc", NACL_R14
     "xmm0", "xmm1", "xmm2", "xmm3"
   );
@@ -888,7 +1074,7 @@ void ScaleARGBRowDownEvenBox_SSE2(const uint8* src_argb,
 
 void ScaleARGBCols_SSE2(uint8* dst_argb, const uint8* src_argb,
                         int dst_width, int x, int dx) {
-  intptr_t x0 = 0, x1 = 0;
+  intptr_t x0, x1;
   asm volatile (
     "movd      %5,%%xmm2                       \n"
     "movd      %6,%%xmm3                       \n"
@@ -941,8 +1127,8 @@ void ScaleARGBCols_SSE2(uint8* dst_argb, const uint8* src_argb,
     MEMOPREG(movd,0x00,3,0,4,xmm0)             //  movd      (%3,%0,4),%%xmm0
     "movd      %%xmm0," MEMACCESS(2) "         \n"
   "99:                                         \n"
-  : "+a"(x0),          // %0
-    "+d"(x1),          // %1
+  : "=&a"(x0),         // %0
+    "=&d"(x1),         // %1
     "+r"(dst_argb),    // %2
     "+r"(src_argb),    // %3
     "+r"(dst_width)    // %4
@@ -993,7 +1179,7 @@ static uvec8 kShuffleFractions = {
 // Bilinear row filtering combines 4x2 -> 4x1. SSSE3 version
 void ScaleARGBFilterCols_SSSE3(uint8* dst_argb, const uint8* src_argb,
                                int dst_width, int x, int dx) {
-  intptr_t x0 = 0, x1 = 0;
+  intptr_t x0, x1;
   asm volatile (
     "movdqa    %0,%%xmm4                       \n"
     "movdqa    %1,%%xmm5                       \n"
@@ -1056,8 +1242,8 @@ void ScaleARGBFilterCols_SSSE3(uint8* dst_argb, const uint8* src_argb,
   : "+r"(dst_argb),    // %0
     "+r"(src_argb),    // %1
     "+rm"(dst_width),  // %2
-    "+r"(x0),          // %3
-    "+r"(x1)           // %4
+    "=&r"(x0),         // %3
+    "=&r"(x1)          // %4
   : "rm"(x),           // %5
     "rm"(dx)           // %6
   : "memory", "cc", NACL_R14

@@ -46,6 +46,15 @@
     return YES;
 }
 
+-(BOOL)fileWriterData:(UInt8 *)data
+{
+    FILE *file = fopen([fullPath UTF8String], "wb");
+    fwrite(data, 640*480*3/2, 1, file);
+    fclose(file);
+    
+    return YES;
+}
+
 -(UInt8 *)fileReader
 {
     

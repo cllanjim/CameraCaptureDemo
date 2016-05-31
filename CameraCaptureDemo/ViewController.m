@@ -113,7 +113,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     yuv420DisplayView.transform = CGAffineTransformRotate(yuv420DisplayView.transform, M_PI/2);
     [self.view addSubview:yuv420DisplayView];
     
-    [NSTimer scheduledTimerWithTimeInterval:frames/60 target:self selector:@selector(displayVideo) userInfo:nil repeats:YES];
+//    [NSTimer scheduledTimerWithTimeInterval:frames/60 target:self selector:@selector(displayVideo) userInfo:nil repeats:YES];
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeSystem];
     btn.frame = CGRectMake(0, 0, 100, 44);
@@ -408,8 +408,10 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 //            pUV+=bytesrow1;
 //        }
         //add code to push yuv420_data to video encoder here
-        NSData *data = [NSData dataWithBytes:yuv420_data length:memmoryLength];
-        [yuv420Data addData:data];
+//        NSData *data = [NSData dataWithBytes:yuv420_data length:memmoryLength];
+//        [yuv420Data addData:data];
+        YUV420Data *yuv = [[YUV420Data alloc] initWithYUV420Data:yuv420_data Width:VIDEO_WIDTH Height:VIDEO_HEIGHT];
+        [yuv420DisplayView renderFrame:yuv];
         
         free(yuv420_data);
         /* unlock the buffer*/

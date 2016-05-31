@@ -185,7 +185,7 @@ const GLfloat gVertices[] = {
 // of 3 textures are used here, one for each of the Y, U and V planes. Having
 // two sets alleviates CPU blockage in the event that the GPU is asked to render
 // to a texture that is already in use.
-static const GLsizei kNumTextureSets = 1;
+static const GLsizei kNumTextureSets = 2;
 static const GLsizei kNumTextures = 3 * kNumTextureSets;
 
 @interface GSOpenGLESDisplayYUV420View ()
@@ -313,11 +313,13 @@ GLKViewDelegate
 
 - (void)setupContext
 {
-    EAGLRenderingAPI api = kEAGLRenderingAPIOpenGLES2;
-    _context = [[EAGLContext alloc] initWithAPI:api];
+    _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
     if (!_context) {
-        NSLog(@"error");
-        return;
+        _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+        if (!_context) {
+            NSLog(@"error");
+            return;
+        }
     }
     
     if (![EAGLContext setCurrentContext:_context]) {
@@ -432,13 +434,13 @@ GLKViewDelegate
     // Don't render unless video frame have changed or the view content
     // has explicitly been marked dirty.
     if (!_isDirty && self.lastDrawnFrame == self.i420Frame) {
-//        return;
+        return;
     }
     
     //don't call display when no frame was received.
     //this fix the black screen problem.  https://bugzilla.grandstream.com/bugzilla/show_bug.cgi?id=60609
     if (self.i420Frame == nil) {
-//        return;
+        return;
     }
     
     // Always reset isDirty at this point, even if -[GLKView display]
@@ -459,7 +461,7 @@ GLKViewDelegate
         return NO;
     }
     if (_lastDrawnFrame == frame) {
-        //        return NO;
+        return NO;
     }
     [self ensureGLContext];
     glClear(GL_COLOR_BUFFER_BIT);
@@ -486,7 +488,7 @@ GLKViewDelegate
         frame.width == _lastDrawnFrame.width &&
         frame.chromaWidth == _lastDrawnFrame.chromaWidth &&
         frame.chromaHeight == _lastDrawnFrame.chromaHeight) {
-//        return YES;
+        return YES;
     }
     GLsizei lumaWidth = frame.width;
     GLsizei lumaHeight = frame.height;
