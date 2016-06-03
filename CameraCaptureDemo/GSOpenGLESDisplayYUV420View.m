@@ -252,8 +252,30 @@ GLKViewDelegate
         glUseProgram(_program);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         _isInitialized = YES;
+        
+        NSNotificationCenter* notificationCenter =
+        [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self
+                               selector:@selector(willResignActive)
+                                   name:UIApplicationWillResignActiveNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(didBecomeActive)
+                                   name:UIApplicationDidBecomeActiveNotification
+                                 object:nil];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    NSLog(@"");
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
+    if (_planeBuffer) {
+        free(_planeBuffer);
+        _planeBuffer = nil;
+    }
 }
 
 - (void)renderFrame:(YUV420Data *)frame
@@ -261,7 +283,8 @@ GLKViewDelegate
     self.i420Frame = frame;
 }
 
-- (void)teardownGL {
+- (void)teardownGL
+{
     [_glkView deleteDrawable];
     
     if (!_isInitialized) {
@@ -276,6 +299,11 @@ GLKViewDelegate
 #if !TARGET_OS_IPHONE
     glDeleteVertexArrays(1, &_vertexArray);
 #endif
+    
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    [_glkView display];
+    
     _isInitialized = NO;
 }
 
@@ -528,12 +556,13 @@ GLKViewDelegate
     }
     if (frame.yPitch != frame.width || frame.uPitch != frame.chromaWidth ||
         frame.vPitch != frame.chromaWidth) {
-//        _planeBuffer.reset(new uint8_t[frame.width * frame.height]);
-//        if (!_planeBuffer) {
-            _planeBuffer = malloc(frame.width * frame.height);
-//        }
-    } else {
-//        _planeBuffer.reset();
+        if (_planeBuffer) {
+            free(_planeBuffer);
+            _planeBuffer = nil;
+        }
+        _planeBuffer = malloc(frame.width * frame.height);
+    }
+    else {
         if (_planeBuffer) {
             free(_planeBuffer);
             _planeBuffer = nil;
@@ -621,6 +650,38 @@ GLKViewDelegate
     
     _currentTextureSet = (_currentTextureSet + 1) % kNumTextureSets;
     return YES;
+}
+
+#pragma mark - app active status changed
+- (void)didBecomeActive {
+    self.i420Frame = nil;
+    
+    if (_isInitialized) {
+        return;
+    }
+    [self ensureGLContext];
+    if (![self setupProgram]) {
+        return;
+    }
+    if (![self setupTextures]) {
+        return;
+    }
+    if (![self setupVertices]) {
+        return;
+    }
+    glUseProgram(_program);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    _isInitialized = YES;
+    
+    _timer.isPaused = NO;
+}
+
+- (void)willResignActive {
+    self.i420Frame = nil;
+    _timer.isPaused = YES;
+    [_glkView deleteDrawable];
+
+    [self teardownGL];
 }
 
 #pragma mark - GLKViewDelegate

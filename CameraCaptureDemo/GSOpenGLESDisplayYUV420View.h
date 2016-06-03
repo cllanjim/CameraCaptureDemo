@@ -16,5 +16,6 @@
 @property(nonatomic, readonly) YUV420Data* lastDrawnFrame;
 
 - (void)renderFrame:(YUV420Data *)frame;
+- (void)teardownGL;
 
 @end

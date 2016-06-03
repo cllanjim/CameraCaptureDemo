@@ -32,13 +32,6 @@
 {
     self = [super init];
     if (self) {
-        
-//        static int i = 0;
-//        if (i > 0) {
-//            return self;
-//        }
-//        i++;
-        
         yuv = malloc(width * height * 3 / 2);
         if (!yuv) {
             NSLog(@"error");

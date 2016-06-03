@@ -181,6 +181,10 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     glClear(GL_COLOR_BUFFER_BIT);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     [glkView display];
+    
+//    [yuv420DisplayView teardownGL];
+//    [yuv420DisplayView removeFromSuperview];
+//    yuv420DisplayView = nil;
 }
 
 - (void)changeCamera
@@ -344,7 +348,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 	didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         fromConnection:(AVCaptureConnection *)connection
 {
-    
+//    return;
     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     /* unlock the buffer*/
     if(CVPixelBufferLockBaseAddress(imageBuffer, 0) == kCVReturnSuccess)
@@ -411,6 +415,15 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 //        NSData *data = [NSData dataWithBytes:yuv420_data length:memmoryLength];
 //        [yuv420Data addData:data];
         YUV420Data *yuv = [[YUV420Data alloc] initWithYUV420Data:yuv420_data Width:VIDEO_WIDTH Height:VIDEO_HEIGHT];
+        
+//        if (!yuv420DisplayView) {
+//            yuv420DisplayView = [[GSOpenGLESDisplayYUV420View alloc] initWithFrame:CGRectMake(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT)];
+//            yuv420DisplayView.center = self.view.center;
+//            yuv420DisplayView.transform = CGAffineTransformMakeScale(0.5f, 0.5f);
+//            yuv420DisplayView.transform = CGAffineTransformRotate(yuv420DisplayView.transform, M_PI/2);
+//            [self.view addSubview:yuv420DisplayView];
+//        }
+        
         [yuv420DisplayView renderFrame:yuv];
         
         free(yuv420_data);
@@ -423,12 +436,12 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     if (VideoDisplayMode_OpenGLES != currentDisplayMode) {
         return;
     }
-    CFDictionaryRef dic = CMCopyDictionaryOfAttachments(nil, sampleBuffer, kCMAttachmentMode_ShouldPropagate);
+//    CFDictionaryRef dic = CMCopyDictionaryOfAttachments(nil, sampleBuffer, kCMAttachmentMode_ShouldPropagate);
     
     CVImageBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     CIImage *image = [CIImage imageWithCVPixelBuffer:pixelBuffer];
     
-    CIImage *transformImage = [image imageByApplyingTransform:CGAffineTransformRotate(CGAffineTransformIdentity, M_PI/2)];
+//    CIImage *transformImage = [image imageByApplyingTransform:CGAffineTransformRotate(CGAffineTransformIdentity, M_PI/2)];
     /*(1 2) (3 4) (5 6) (7 8)
      *镜像*
      */
