@@ -23,6 +23,8 @@
 @property(nonatomic) NSInteger uPitch;
 @property(nonatomic) NSInteger vPitch;
 
+@property(nonatomic)int64_t render_time_ms_;
+
 - (id)initWithYUV420Data:(UInt8 *)data Width:(NSUInteger)width Height:(NSUInteger)height;
 
 @end
