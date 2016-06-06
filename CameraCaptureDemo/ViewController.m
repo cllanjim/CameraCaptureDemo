@@ -271,6 +271,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     [captureOutput setSampleBufferDelegate:self queue:captureQueue];
     /*On iOS, the only supported key is kCVPixelBufferPixelFormatTypeKey. Supported pixel formats are
      kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange, kCVPixelFormatType_420YpCbCr8BiPlanarFullRange and kCVPixelFormatType_32BGRA.*/
+    //      kCVPixelFormatType_420YpCbCr8Planar is YUV420
+    //      kCVPixelFormatType_420YpCbCr8BiPlanarFullRange is NV12
     captureOutput.videoSettings = [NSDictionary
                                       dictionaryWithObject:[NSNumber numberWithLong:
 #ifdef VIDEO_FORMAT_JPEG
