@@ -484,8 +484,23 @@ void VTCompressionOutputCallbackData(void* encoder,
     return 0;
 }
 
+-(void)SetBitrateBps:(uint32_t)bitrate_bps
+{
+    if (encoder_bitrate_bps_ != bitrate_bps) {
+        [self SetEncoderBitrateBps:bitrate_bps];
+    }
+}
+
 -(int)SetRates:(uint32_t)new_bitrate_kbit Rate:(uint32_t)frame_rate
 {
+    target_bitrate_bps_ = 1000 * new_bitrate_kbit;
+//    bitrate_adjuster_.SetTargetBitrateBps(target_bitrate_bps_);
+//    SetBitrateBps(bitrate_adjuster_.GetAdjustedBitrateBps());
+    [self SetBitrateBps:frame_rate];
+    
+//    rtc::CritScope lock(&quality_scaler_crit_);
+//    quality_scaler_.ReportFramerate(frame_rate);
+    
     return 0;
 }
 
@@ -499,24 +514,22 @@ void VTCompressionOutputCallbackData(void* encoder,
 - (void)OnEncodedFrame:(OSStatus)status Flag:(VTEncodeInfoFlags)info_flags Buffer:(CMSampleBufferRef)sample_buffer Info:(CodecSpecificInfo *)codec_specific_info Width:(int32_t)width Height:(int32_t)height RenderTime:(int64_t)render_time_ms                      TimeStamp:(uint32_t)timestamp Rotation:(VideoRotation)rotation
 {
     if (status != noErr) {
-        LOG(LS_ERROR) << "H264 encode failed.";
+//        LOG(LS_ERROR) << "H264 encode failed.";
         return;
     }
     if (info_flags & kVTEncodeInfo_FrameDropped) {
-        LOG(LS_INFO) << "H264 encode dropped frame.";
-        rtc::CritScope lock(&quality_scaler_crit_);
-        quality_scaler_.ReportDroppedFrame();
+//        LOG(LS_INFO) << "H264 encode dropped frame.";
+//        rtc::CritScope lock(&quality_scaler_crit_);
+//        quality_scaler_.ReportDroppedFrame();
         return;
     }
     
     bool is_keyframe = false;
     CFArrayRef attachments =
     CMSampleBufferGetSampleAttachmentsArray(sample_buffer, 0);
-    if (attachments != nullptr && CFArrayGetCount(attachments)) {
-        CFDictionaryRef attachment =
-        static_cast<CFDictionaryRef>(CFArrayGetValueAtIndex(attachments, 0));
-        is_keyframe =
-        !CFDictionaryContainsKey(attachment, kCMSampleAttachmentKey_NotSync);
+    if (attachments != nil && CFArrayGetCount(attachments)) {
+        CFDictionaryRef attachment = CFArrayGetValueAtIndex(attachments, 0);
+        is_keyframe = !CFDictionaryContainsKey(attachment, kCMSampleAttachmentKey_NotSync);
     }
     
     // Convert the sample buffer into a buffer suitable for RTP packetization.
