@@ -76,6 +76,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     yuv420Data = [[BufferManager alloc] init];
     
     [self initCaptureSession];
+    [self updateVideoOrientation];
     switch (currentDisplayMode) {
         case VideoDisplayMode_PreviewLayer:
             [self initPreviewLayer];
@@ -138,11 +139,20 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     [btn setTitle:@"停止采集" forState:UIControlStateNormal];
     [btn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [self.view addSubview:btn];
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)dealloc
+{
+    NSLog(@"");
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)displayVideo
@@ -285,6 +295,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     if ([captureSession canAddOutput:captureOutput]) {
         [captureSession addOutput:captureOutput];
     }
+    
+    captureConnection = [captureOutput connectionWithMediaType:AVMediaTypeVideo];
 }
 
 - (BOOL)initPreviewLayer
@@ -316,6 +328,41 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     [self.view addSubview:glkView];
 }
 
+- (BOOL)updateVideoOrientation
+{
+    if (!captureConnection.supportsVideoOrientation) {
+        // TODO(tkchin): set rotation bit on frames.
+        return NO;
+    }
+    
+    AVCaptureVideoOrientation orientation = AVCaptureVideoOrientationPortrait;
+    switch ([UIDevice currentDevice].orientation) {
+        case UIDeviceOrientationPortrait:
+            orientation = AVCaptureVideoOrientationPortrait;
+            break;
+        case UIDeviceOrientationPortraitUpsideDown:
+            orientation = AVCaptureVideoOrientationPortraitUpsideDown;
+            break;
+        case UIDeviceOrientationLandscapeLeft:
+            orientation = AVCaptureVideoOrientationLandscapeRight;
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            orientation = AVCaptureVideoOrientationLandscapeLeft;
+            break;
+        case UIDeviceOrientationFaceUp:
+        case UIDeviceOrientationFaceDown:
+        case UIDeviceOrientationUnknown:
+            break;
+            //            if (!_orientationHasChanged) {
+            //                _captureConnection.videoOrientation = orientation;
+            //            }
+            //            return;
+    }
+    captureConnection.videoOrientation = orientation;
+    
+    return YES;
+}
+
 - (void)changeCameraPosition:(AVCaptureDevicePosition)position
 {
     [captureSession beginConfiguration];
@@ -344,6 +391,12 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
             break;
     }
     
+}
+
+// Handle device orientation changes
+- (void)deviceOrientationDidChange: (NSNotification *)notification
+{
+    [self updateVideoOrientation];
 }
 
 - (void) captureOutput:(AVCaptureOutput *) captureOutput
