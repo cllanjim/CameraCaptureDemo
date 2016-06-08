@@ -6,11 +6,16 @@
 //  Copyright © 2016年 ZhouDamon. All rights reserved.
 //
 
+#import <vector>
+
 #import "GSVideoToolBoxEncoder.h"
 #import "libyuv.h"
 
+static FILE *dataFile = nil;
+const char kAnnexBHeaderBytes[4] = {0, 0, 0, 1};
+
 // Convenience function for creating a dictionary.
-inline CFDictionaryRef CreateCFDictionary(CFTypeRef* keys,
+CFDictionaryRef CreateCFDictionary(CFTypeRef* keys,
                                           CFTypeRef* values,
                                           size_t size) {
     return CFDictionaryCreate(kCFAllocatorDefault, keys, values, size,
@@ -133,19 +138,19 @@ bool CopyVideoFrameToPixelBuffer(const YUV420Data* frame,
 //               kCVPixelFormatType_420YpCbCr8BiPlanarFullRange);
     if (CVPixelBufferGetPixelFormatType(pixel_buffer) ==
         kCVPixelFormatType_420YpCbCr8BiPlanarFullRange) {
-        
+        NSLog(@"");
     }
 //    RTC_DCHECK(CVPixelBufferGetHeightOfPlane(pixel_buffer, 0) ==
 //               static_cast<size_t>(frame.height()));
     if (CVPixelBufferGetHeightOfPlane(pixel_buffer, 0) ==
         frame.height) {
-        
+        NSLog(@"");
     }
 //    RTC_DCHECK(CVPixelBufferGetWidthOfPlane(pixel_buffer, 0) ==
 //               static_cast<size_t>(frame.width()));
     if (CVPixelBufferGetWidthOfPlane(pixel_buffer, 0) ==
         frame.width) {
-        
+        NSLog(@"");
     }
     
     CVReturn cvRet = CVPixelBufferLockBaseAddress(pixel_buffer, 0);
@@ -158,7 +163,7 @@ bool CopyVideoFrameToPixelBuffer(const YUV420Data* frame,
     uint8_t* dst_uv = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(pixel_buffer, 1);
     size_t dst_stride_uv = CVPixelBufferGetBytesPerRowOfPlane(pixel_buffer, 1);
     // Convert I420 to NV12.
-    int ret = I420ToNV12(
+    int ret = libyuv::I420ToNV12(
                                  frame.yPlane,
                                  frame.yPitch,
                                  frame.uPlane,
@@ -172,6 +177,9 @@ bool CopyVideoFrameToPixelBuffer(const YUV420Data* frame,
 //        LOG(LS_ERROR) << "Error converting I420 VideoFrame to NV12 :" << ret;
         return false;
     }
+//    size_t size = fwrite(dst_y, frame.width*frame.height*3/2, 1, dataFile);
+    NSLog(@"");
+    
     return true;
 }
 
@@ -190,13 +198,43 @@ void VTCompressionOutputCallbackData(void* encoder,
                                  CMSampleBufferRef sample_buffer) {
 //    std::unique_ptr<FrameEncodeParams> encode_params(
 //                                                     reinterpret_cast<FrameEncodeParams*>(params));
-//    encode_params->encoder->OnEncodedFrame(
+//    FrameEncodeParams *encode_params = (__bridge FrameEncodeParams *)params;
+    GSVideoToolBoxEncoder *selfEncoder = (__bridge GSVideoToolBoxEncoder *)params;
+    [selfEncoder OnEncodedFrame:status Flag:info_flags Buffer:sample_buffer Info:nil Width:640 Height:480 RenderTime:0 TimeStamp:0 Rotation:kVideoRotation_0];
+    
+//     (
 //                                           status, info_flags, sample_buffer, encode_params->codec_specific_info,
 //                                           encode_params->width, encode_params->height,
 //                                           encode_params->render_time_ms, encode_params->timestamp,
 //                                           encode_params->rotation);
     NSLog(@"");
 }
+
+@implementation VideoCodec
+
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        
+    }
+    return self;
+}
+
+@end
+
+@implementation FrameEncodeParams
+
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        
+    }
+    return self;
+}
+
+@end
 
 @interface GSVideoToolBoxEncoder ()
 {
@@ -228,7 +266,20 @@ void VTCompressionOutputCallbackData(void* encoder,
 {
     self = [super init];
     if (self) {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *path = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"yuv420"];
+        NSFileManager *manager = [NSFileManager defaultManager];
+        if (NO == [manager fileExistsAtPath:path]) {
+            [manager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
+        }
         
+        NSString *fullPath = [path stringByAppendingPathComponent:@"data.yuv"];
+        if ([manager fileExistsAtPath:fullPath]) {
+            [manager removeItemAtPath:fullPath error:nil];
+        }
+        [manager createFileAtPath:fullPath contents:nil attributes:nil];
+        
+        dataFile = fopen([fullPath UTF8String], "wb");
     }
     
     return self;
@@ -348,8 +399,8 @@ void VTCompressionOutputCallbackData(void* encoder,
 //        QualityScaler::Resolution res = quality_scaler_.GetScaledResolution();
         // TODO(tkchin): We may need to enforce width/height dimension restrictions
         // to match what the encoder supports.
-        width_ = 352;//res.width;
-        height_ = 288;//res.height;
+        width_ = 640;//res.width;
+        height_ = 480;//res.height;
     }
     // We can only set average bitrate on the HW encoder.
     target_bitrate_bps_ = codec_settings.startBitrate;
@@ -368,8 +419,112 @@ void VTCompressionOutputCallbackData(void* encoder,
 //    return quality_scaler_.GetScaledFrame(frame);
 //}
 
+-(int)EncodeCVI:(CVImageBufferRef)input_image Info:(CodecSpecificInfo *)codec_specific_info Type:(NSUInteger *)frame_types
+{
+    //    fwrite(input_image.yPlane, input_image.width*input_image.height*3/2, 1, dataFile);
+    
+    //    RTC_DCHECK(!frame.IsZeroSize());
+    //    if (!callback_ || !compression_session_) {
+    //        return WEBRTC_VIDEO_CODEC_UNINITIALIZED;
+    //    }
+#if defined(WEBRTC_IOS)
+    //    if (!RTCIsUIApplicationActive()) {
+    // Ignore all encode requests when app isn't active. In this state, the
+    // hardware encoder has been invalidated by the OS.
+    //        return WEBRTC_VIDEO_CODEC_OK;
+    //    }
+#endif
+    bool is_keyframe_required = false;
+    //    const VideoFrame& input_image = GetScaledFrameOnEncode(frame);
+
+    
+    // Get a pixel buffer from the pool and copy frame data over.
+    CVPixelBufferPoolRef pixel_buffer_pool =
+    VTCompressionSessionGetPixelBufferPool(compression_session_);
+#if defined(WEBRTC_IOS)
+    if (!pixel_buffer_pool) {
+        // Kind of a hack. On backgrounding, the compression session seems to get
+        // invalidated, which causes this pool call to fail when the application
+        // is foregrounded and frames are being sent for encoding again.
+        // Resetting the session when this happens fixes the issue.
+        // In addition we request a keyframe so video can recover quickly.
+        [self ResetCompressionSession];
+        pixel_buffer_pool =
+        VTCompressionSessionGetPixelBufferPool(compression_session_);
+        is_keyframe_required = true;
+    }
+#endif
+    if (!pixel_buffer_pool) {
+        //        LOG(LS_ERROR) << "Failed to get pixel buffer pool.";
+        //        return WEBRTC_VIDEO_CODEC_ERROR;
+    }
+    CVPixelBufferRef pixel_buffer = CVPixelBufferRetain(input_image);//nil;
+//    CVReturn ret = CVPixelBufferPoolCreatePixelBuffer(nil, pixel_buffer_pool,
+//                                                      &pixel_buffer);
+//    if (ret != kCVReturnSuccess) {
+        //        LOG(LS_ERROR) << "Failed to create pixel buffer: " << ret;
+        // We probably want to drop frames here, since failure probably means
+        // that the pool is empty.
+        //        return WEBRTC_VIDEO_CODEC_ERROR;
+//    }
+    //    RTC_DCHECK(pixel_buffer);
+//    if (!CopyVideoFrameToPixelBuffer(input_image, pixel_buffer)) {
+        //        LOG(LS_ERROR) << "Failed to copy frame data.";
+//        CVBufferRelease(pixel_buffer);
+        //        return WEBRTC_VIDEO_CODEC_ERROR;
+//    }
+    
+    // Check if we need a keyframe.
+    if (!is_keyframe_required && frame_types) {
+        if (*frame_types == kVideoFrameKey) {
+            is_keyframe_required = true;
+        }
+        //        for (auto frame_type : *frame_types) {
+        //            if (frame_type == kVideoFrameKey) {
+        //                is_keyframe_required = true;
+        //                break;
+        //            }
+        //        }
+    }
+    
+    CMTime presentation_time_stamp = CMTimeMake(0, 1000);
+    CFDictionaryRef frame_properties = nil;
+    if (is_keyframe_required) {
+        CFTypeRef keys[] = {kVTEncodeFrameOptionKey_ForceKeyFrame};
+        CFTypeRef values[] = {kCFBooleanTrue};
+        frame_properties = CreateCFDictionary(keys, values, 1);
+    }
+    //    std::unique_ptr<internal::FrameEncodeParams> encode_params;
+    //    encode_params.reset(new internal::FrameEncodeParams(
+    //                                                        this, codec_specific_info, width_, height_, input_image.render_time_ms(),
+    //                                                        input_image.timestamp(), input_image.rotation()));
+    
+    //    FrameEncodeParams *params = [[FrameEncodeParams alloc] init];
+    //    params.encoder = self;
+    
+    // Update the bitrate if needed.
+    //    SetBitrateBps(bitrate_adjuster_.GetAdjustedBitrateBps());
+    
+    OSStatus status = VTCompressionSessionEncodeFrame(
+                                                      compression_session_, pixel_buffer, presentation_time_stamp,
+                                                      kCMTimeInvalid, frame_properties, (__bridge void *)self/*encode_params.release()*/, nil);
+    if (frame_properties) {
+        CFRelease(frame_properties);
+    }
+    if (pixel_buffer) {
+        CVBufferRelease(pixel_buffer);
+    }
+    if (status != noErr) {
+        //        LOG(LS_ERROR) << "Failed to encode frame with code: " << status;
+        //        return WEBRTC_VIDEO_CODEC_ERROR;
+    }
+    return 0;
+}
+
 -(int)Encode:(YUV420Data *)input_image Info:(CodecSpecificInfo *)codec_specific_info Type:(NSUInteger *)frame_types
 {
+    fwrite(input_image.yPlane, input_image.width*input_image.height*3/2, 1, dataFile);
+    
 //    RTC_DCHECK(!frame.IsZeroSize());
 //    if (!callback_ || !compression_session_) {
 //        return WEBRTC_VIDEO_CODEC_UNINITIALIZED;
@@ -385,8 +540,8 @@ void VTCompressionOutputCallbackData(void* encoder,
 //    const VideoFrame& input_image = GetScaledFrameOnEncode(frame);
 
     if (input_image.width != width_ || input_image.height != height_) {
-        width_ = input_image.width;
-        height_ = input_image.height;
+        width_ = (int32_t)(input_image.width);
+        height_ = (int32_t)(input_image.height);
         int ret = [self ResetCompressionSession];
         if (ret < 0)
             return ret;
@@ -453,12 +608,15 @@ void VTCompressionOutputCallbackData(void* encoder,
 //                                                        this, codec_specific_info, width_, height_, input_image.render_time_ms(),
 //                                                        input_image.timestamp(), input_image.rotation()));
     
+//    FrameEncodeParams *params = [[FrameEncodeParams alloc] init];
+//    params.encoder = self;
+    
     // Update the bitrate if needed.
 //    SetBitrateBps(bitrate_adjuster_.GetAdjustedBitrateBps());
     
     OSStatus status = VTCompressionSessionEncodeFrame(
                                                       compression_session_, pixel_buffer, presentation_time_stamp,
-                                                      kCMTimeInvalid, frame_properties, nil/*encode_params.release()*/, nil);
+                                                      kCMTimeInvalid, frame_properties, (__bridge void *)self/*encode_params.release()*/, nil);
     if (frame_properties) {
         CFRelease(frame_properties);
     }
@@ -517,6 +675,60 @@ void VTCompressionOutputCallbackData(void* encoder,
 //        LOG(LS_ERROR) << "H264 encode failed.";
         return;
     }
+    
+    // Get format description from the sample buffer.
+    CMVideoFormatDescriptionRef description =
+    CMSampleBufferGetFormatDescription(sample_buffer);
+    if (description == nil) {
+//        LOG(LS_ERROR) << "Failed to get sample buffer's description.";
+//        return false;
+    }
+    
+    // Get parameter set information.
+    int nalu_header_size = 0;
+    size_t param_set_count = 0;
+    OSStatus statuss = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(
+                                                                         description, 0, nil, nil, &param_set_count, &nalu_header_size);
+    if (statuss != noErr) {
+//        LOG(LS_ERROR) << "Failed to get parameter set.";
+//        return false;
+    }
+    
+    bool is_keyframe = false;
+    CFArrayRef attachments =
+    CMSampleBufferGetSampleAttachmentsArray(sample_buffer, 0);
+    if (attachments != nil && CFArrayGetCount(attachments)) {
+        CFDictionaryRef attachment = static_cast<CFDictionaryRef>(CFArrayGetValueAtIndex(attachments, 0));
+        //        CFDictionaryRef attachment = CFArrayGetValueAtIndex(attachments, 0);
+        is_keyframe = !CFDictionaryContainsKey(attachment, kCMSampleAttachmentKey_NotSync);
+    }
+    
+    size_t nalu_offset = 0;
+    std::vector<size_t> frag_offsets;
+    std::vector<size_t> frag_lengths;
+    
+    // Place all parameter sets at the front of buffer.
+    if (is_keyframe) {
+        size_t param_set_size = 0;
+        const uint8_t* param_set = nullptr;
+        for (size_t i = 0; i < param_set_count; ++i) {
+            status = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(
+                                                                        description, i, &param_set, &param_set_size, nil, nil);
+            if (status != noErr) {
+//                LOG(LS_ERROR) << "Failed to get parameter set.";
+//                return false;
+            }
+            // Update buffer.
+//            annexb_buffer->AppendData(kAnnexBHeaderBytes, sizeof(kAnnexBHeaderBytes));
+//            annexb_buffer->AppendData(reinterpret_cast<const char*>(param_set),
+//                                      param_set_size);
+            // Update fragmentation.
+            frag_offsets.push_back(nalu_offset + sizeof(kAnnexBHeaderBytes));
+            frag_lengths.push_back(param_set_size);
+            nalu_offset += sizeof(kAnnexBHeaderBytes) + param_set_size;
+        }
+    }
+    
     if (info_flags & kVTEncodeInfo_FrameDropped) {
 //        LOG(LS_INFO) << "H264 encode dropped frame.";
 //        rtc::CritScope lock(&quality_scaler_crit_);
@@ -524,50 +736,109 @@ void VTCompressionOutputCallbackData(void* encoder,
         return;
     }
     
-    bool is_keyframe = false;
-    CFArrayRef attachments =
-    CMSampleBufferGetSampleAttachmentsArray(sample_buffer, 0);
-    if (attachments != nil && CFArrayGetCount(attachments)) {
-        CFDictionaryRef attachment = CFArrayGetValueAtIndex(attachments, 0);
-        is_keyframe = !CFDictionaryContainsKey(attachment, kCMSampleAttachmentKey_NotSync);
+    // Get block buffer from the sample buffer.
+    CMBlockBufferRef block_buffer =
+    CMSampleBufferGetDataBuffer(sample_buffer);
+    if (block_buffer == nil) {
+//        LOG(LS_ERROR) << "Failed to get sample buffer's block buffer.";
+//        return false;
     }
-    
-    // Convert the sample buffer into a buffer suitable for RTP packetization.
-    // TODO(tkchin): Allocate buffers through a pool.
-    std::unique_ptr<rtc::Buffer> buffer(new rtc::Buffer());
-    std::unique_ptr<webrtc::RTPFragmentationHeader> header;
-    {
-        webrtc::RTPFragmentationHeader* header_raw;
-        bool result = H264CMSampleBufferToAnnexBBuffer(sample_buffer, is_keyframe,
-                                                       buffer.get(), &header_raw);
-        header.reset(header_raw);
-        if (!result) {
-            return;
+    CMBlockBufferRef contiguous_buffer = nil;
+    // Make sure block buffer is contiguous.
+    if (!CMBlockBufferIsRangeContiguous(block_buffer, 0, 0)) {
+        status = CMBlockBufferCreateContiguous(
+                                               nil, block_buffer, nil, nil, 0, 0, 0, &contiguous_buffer);
+        if (status != noErr) {
+//            LOG(LS_ERROR) << "Failed to flatten non-contiguous block buffer: "
+//            << status;
+//            return false;
         }
-    }
-    webrtc::EncodedImage frame(buffer->data(), buffer->size(), buffer->size());
-    frame._encodedWidth = width;
-    frame._encodedHeight = height;
-    frame._completeFrame = true;
-    frame._frameType =
-    is_keyframe ? webrtc::kVideoFrameKey : webrtc::kVideoFrameDelta;
-    frame.capture_time_ms_ = render_time_ms;
-    frame._timeStamp = timestamp;
-    frame.rotation_ = rotation;
-    
-    h264_bitstream_parser_.ParseBitstream(buffer->data(), buffer->size());
-    int qp;
-    if (h264_bitstream_parser_.GetLastSliceQp(&qp)) {
-        rtc::CritScope lock(&quality_scaler_crit_);
-        quality_scaler_.ReportQP(qp);
+    } else {
+        contiguous_buffer = block_buffer;
+        // Retain to make cleanup easier.
+        CFRetain(contiguous_buffer);
+        block_buffer = nil;
     }
     
-    int result = callback_->Encoded(frame, &codec_specific_info, header.get());
-    if (result != 0) {
-        LOG(LS_ERROR) << "Encode callback failed: " << result;
-        return;
+    // Now copy the actual data.
+    char* data_ptr = nil;
+    size_t block_buffer_size = CMBlockBufferGetDataLength(contiguous_buffer);
+    status = CMBlockBufferGetDataPointer(contiguous_buffer, 0, nil, nil,
+                                         &data_ptr);
+    if (status != noErr) {
+//        LOG(LS_ERROR) << "Failed to get block buffer data.";
+        CFRelease(contiguous_buffer);
+//        return false;
     }
-    bitrate_adjuster_.Update(frame._size);
+    
+    NSData *data = [NSData dataWithBytes:data_ptr length:block_buffer_size];
+    
+    
+    size_t bytes_remaining = block_buffer_size;
+    while (bytes_remaining > 0) {
+        // The size type here must match |nalu_header_size|, we expect 4 bytes.
+        // Read the length of the next packet of data. Must convert from big endian
+        // to host endian.
+//        RTC_DCHECK_GE(bytes_remaining, (size_t)nalu_header_size);
+        if (bytes_remaining < nalu_header_size) {
+            break;
+        }
+        uint32_t* uint32_data_ptr = reinterpret_cast<uint32_t*>(data_ptr);
+        uint32_t packet_size = CFSwapInt32BigToHost(*uint32_data_ptr);
+        // Update buffer.
+//        annexb_buffer->AppendData(kAnnexBHeaderBytes, sizeof(kAnnexBHeaderBytes));
+//        annexb_buffer->AppendData(data_ptr + nalu_header_size, packet_size);
+//        size_t size = fwrite(data_ptr + nalu_header_size, packet_size, 1, dataFile);
+//        NSLog(@"%ld", size);
+        // Update fragmentation.
+        frag_offsets.push_back(nalu_offset + sizeof(kAnnexBHeaderBytes));
+        frag_lengths.push_back(packet_size);
+        nalu_offset += sizeof(kAnnexBHeaderBytes) + packet_size;
+        
+        size_t bytes_written = packet_size + nalu_header_size;
+        bytes_remaining -= bytes_written;
+        data_ptr += bytes_written;
+    }
+    
+//    size_t size = fwrite(data_ptr, block_buffer_size, 1, dataFile);
+//    NSLog(@"");
+    
+//    // Convert the sample buffer into a buffer suitable for RTP packetization.
+//    // TODO(tkchin): Allocate buffers through a pool.
+//    std::unique_ptr<rtc::Buffer> buffer(new rtc::Buffer());
+//    std::unique_ptr<webrtc::RTPFragmentationHeader> header;
+//    {
+//        webrtc::RTPFragmentationHeader* header_raw;
+//        bool result = H264CMSampleBufferToAnnexBBuffer(sample_buffer, is_keyframe,
+//                                                       buffer.get(), &header_raw);
+//        header.reset(header_raw);
+//        if (!result) {
+//            return;
+//        }
+//    }
+//    webrtc::EncodedImage frame(buffer->data(), buffer->size(), buffer->size());
+//    frame._encodedWidth = width;
+//    frame._encodedHeight = height;
+//    frame._completeFrame = true;
+//    frame._frameType =
+//    is_keyframe ? webrtc::kVideoFrameKey : webrtc::kVideoFrameDelta;
+//    frame.capture_time_ms_ = render_time_ms;
+//    frame._timeStamp = timestamp;
+//    frame.rotation_ = rotation;
+//    
+//    h264_bitstream_parser_.ParseBitstream(buffer->data(), buffer->size());
+//    int qp;
+//    if (h264_bitstream_parser_.GetLastSliceQp(&qp)) {
+//        rtc::CritScope lock(&quality_scaler_crit_);
+//        quality_scaler_.ReportQP(qp);
+//    }
+//    
+//    int result = callback_->Encoded(frame, &codec_specific_info, header.get());
+//    if (result != 0) {
+//        LOG(LS_ERROR) << "Encode callback failed: " << result;
+//        return;
+//    }
+//    bitrate_adjuster_.Update(frame._size);
 }
 
 @end

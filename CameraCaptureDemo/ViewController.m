@@ -25,6 +25,8 @@
 #import "GSOpenGLESDisplayYUV420View.h"
 #import "YUV420Data.h"
 
+#import "GSVideoToolBoxEncoder.h"
+
 #define VIDEO_WIDTH 640
 #define VIDEO_HEIGHT 480
 
@@ -61,6 +63,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     OpenGLView20 *displayView;
     
     GSOpenGLESDisplayYUV420View *yuv420DisplayView;
+    
+    GSVideoToolBoxEncoder *_hdEncoder;
 }
 
 @end
@@ -76,7 +80,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     yuv420Data = [[BufferManager alloc] init];
     
     [self initCaptureSession];
-    [self updateVideoOrientation];
+//    [self updateVideoOrientation];
     switch (currentDisplayMode) {
         case VideoDisplayMode_PreviewLayer:
             [self initPreviewLayer];
@@ -142,6 +146,9 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
+    
+    
+    [self initVideoToolBoxEncoder];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -328,6 +335,19 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     [self.view addSubview:glkView];
 }
 
+- (void)initVideoToolBoxEncoder
+{
+    _hdEncoder = [[GSVideoToolBoxEncoder alloc] init];
+    VideoCodec *codec_ = [[VideoCodec alloc] init];
+    codec_.codecType = VideoCodecType_H264;
+    codec_.maxFramerate = 30;
+    codec_.width = 640;
+    codec_.height = 480;
+    codec_.startBitrate = 512;
+    codec_.maxFramerate = 10;
+    [_hdEncoder InitEncode:codec_ Cores:2 Payload:800];
+}
+
 - (BOOL)updateVideoOrientation
 {
     if (!captureConnection.supportsVideoOrientation) {
@@ -396,6 +416,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 // Handle device orientation changes
 - (void)deviceOrientationDidChange: (NSNotification *)notification
 {
+    return;
     [self updateVideoOrientation];
 }
 
@@ -437,7 +458,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
         yPlaneBytesPerRow * yPlaneHeight + uvPlaneBytesPerRow * uvPlaneHeight;
         int stride_y = (int)width;
         int stride_uv = ((int)width + 1) / 2;
-        int memmoryLength = stride_y * (int)height + (stride_uv + stride_uv) * (((int)height + 1) / 2);
+        int memmoryLength = width*height*3/2;//stride_y * (int)height + (stride_uv + stride_uv) * (((int)height + 1) / 2);
         UInt8 *yuv420_data = (UInt8 *)malloc(memmoryLength);//buffer to store YUV with layout YYYYYYYYUUVV
         memset(yuv420_data, 0, memmoryLength);
         
@@ -478,6 +499,9 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 //            yuv420DisplayView.transform = CGAffineTransformRotate(yuv420DisplayView.transform, M_PI/2);
 //            [self.view addSubview:yuv420DisplayView];
 //        }
+        static NSUInteger key = 3;
+        [_hdEncoder Encode:yuv Info:nil Type:&key];
+//        [_hdEncoder EncodeCVI:imageBuffer Info:nil Type:&key];
         
         [yuv420DisplayView renderFrame:yuv];
         

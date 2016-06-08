@@ -12,7 +12,7 @@
 
 //#include <vector>
 
-#import "commonType.h"
+//#import "commonType.h"
 #import "YUV420Data.h"
 
 //// Video codec
@@ -117,6 +117,12 @@ typedef NS_ENUM(NSUInteger, VideoCodecType)
     //    bool operator!=(const VideoCodec& other) const = delete;
 @end
 
+@class GSVideoToolBoxEncoder;
+@interface FrameEncodeParams : NSObject
+@property (nonatomic, strong) GSVideoToolBoxEncoder *encoder;
+
+@end
+
 @interface VideoFrame : NSObject
 
 @property (nonatomic) size_t width;
@@ -167,6 +173,8 @@ typedef NS_ENUM(NSUInteger, VideoRotation)
 -(int)InitEncode:(VideoCodec *)codec_settings Cores:(int)number_of_cores Payload:(size_t)max_payload_size;
 
 -(int)Encode:(YUV420Data *)input_image Info:(CodecSpecificInfo *)codec_specific_info Type:(NSUInteger *)frame_types;
+
+-(int)EncodeCVI:(CVImageBufferRef)input_image Info:(CodecSpecificInfo *)codec_specific_info Type:(NSUInteger *)frame_types;
 
 //int RegisterEncodeCompleteCallback(EncodedImageCallback* callback) override;
 
