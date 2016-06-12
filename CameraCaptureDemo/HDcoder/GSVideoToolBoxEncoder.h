@@ -189,4 +189,6 @@ typedef NS_ENUM(NSUInteger, VideoRotation)
 
 - (void)OnEncodedFrame:(OSStatus)status Flag:(VTEncodeInfoFlags)info_flags Buffer:(CMSampleBufferRef)sample_buffer Info:(CodecSpecificInfo *)codec_specific_info Width:(int32_t)width Height:(int32_t)height RenderTime:(int64_t)render_time_ms                      TimeStamp:(uint32_t)timestamp Rotation:(VideoRotation)rotation;
 
+- (void)stopFile;
+
 @end

@@ -199,6 +199,15 @@ void VTCompressionOutputCallbackData(void* encoder,
 //    std::unique_ptr<FrameEncodeParams> encode_params(
 //                                                     reinterpret_cast<FrameEncodeParams*>(params));
 //    FrameEncodeParams *encode_params = (__bridge FrameEncodeParams *)params;
+    
+//    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sample_buffer);
+//    const int kYPlaneIndex = 0;
+//    const int kUVPlaneIndex = 1;
+//    size_t yPlaneBytesPerRow = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer, kYPlaneIndex);
+//    size_t yPlaneHeight = CVPixelBufferGetHeightOfPlane(imageBuffer, kYPlaneIndex);
+//    size_t uvPlaneBytesPerRow = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer, kUVPlaneIndex);
+//    size_t uvPlaneHeight = CVPixelBufferGetHeightOfPlane(imageBuffer, kUVPlaneIndex);
+    
     GSVideoToolBoxEncoder *selfEncoder = (__bridge GSVideoToolBoxEncoder *)params;
     [selfEncoder OnEncodedFrame:status Flag:info_flags Buffer:sample_buffer Info:nil Width:640 Height:480 RenderTime:0 TimeStamp:0 Rotation:kVideoRotation_0];
     
@@ -273,7 +282,7 @@ void VTCompressionOutputCallbackData(void* encoder,
             [manager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
         }
         
-        NSString *fullPath = [path stringByAppendingPathComponent:@"data.yuv"];
+        NSString *fullPath = [path stringByAppendingPathComponent:@"datah264"];
         if ([manager fileExistsAtPath:fullPath]) {
             [manager removeItemAtPath:fullPath error:nil];
         }
@@ -311,7 +320,7 @@ void VTCompressionOutputCallbackData(void* encoder,
                                    kVTCompressionPropertyKey_RealTime, true);
     SetVTSessionPropertyFour(compression_session_,
                                    kVTCompressionPropertyKey_ProfileLevel,
-                                   kVTProfileLevel_H264_Baseline_AutoLevel);
+                                   kVTProfileLevel_H264_Baseline_AutoLevel);//kVTProfileLevel_H264_Baseline_AutoLevel//kVTProfileLevel_H264_Baseline_4_1
     SetVTSessionPropertyThree(compression_session_,
                                    kVTCompressionPropertyKey_AllowFrameReordering,
                                    false);
@@ -331,6 +340,9 @@ void VTCompressionOutputCallbackData(void* encoder,
     // internal::SetVTSessionProperty(
     //     compression_session_,
     //     kVTCompressionPropertyKey_MaxKeyFrameIntervalDuration, 240);
+    
+    // Tell the encoder to start encoding
+    VTCompressionSessionPrepareToEncodeFrames(compression_session_);
 }
 
 -(int)ResetCompressionSession
@@ -523,7 +535,7 @@ void VTCompressionOutputCallbackData(void* encoder,
 
 -(int)Encode:(YUV420Data *)input_image Info:(CodecSpecificInfo *)codec_specific_info Type:(NSUInteger *)frame_types
 {
-    fwrite(input_image.yPlane, input_image.width*input_image.height*3/2, 1, dataFile);
+//    fwrite(input_image.yPlane, input_image.width*input_image.height*3/2, 1, dataFile);
     
 //    RTC_DCHECK(!frame.IsZeroSize());
 //    if (!callback_ || !compression_session_) {
@@ -548,8 +560,7 @@ void VTCompressionOutputCallbackData(void* encoder,
     }
     
     // Get a pixel buffer from the pool and copy frame data over.
-    CVPixelBufferPoolRef pixel_buffer_pool =
-    VTCompressionSessionGetPixelBufferPool(compression_session_);
+    CVPixelBufferPoolRef pixel_buffer_pool = VTCompressionSessionGetPixelBufferPool(compression_session_);
 #if defined(WEBRTC_IOS)
     if (!pixel_buffer_pool) {
         // Kind of a hack. On backgrounding, the compression session seems to get
@@ -558,8 +569,7 @@ void VTCompressionOutputCallbackData(void* encoder,
         // Resetting the session when this happens fixes the issue.
         // In addition we request a keyframe so video can recover quickly.
         [self ResetCompressionSession];
-        pixel_buffer_pool =
-        VTCompressionSessionGetPixelBufferPool(compression_session_);
+        pixel_buffer_pool = VTCompressionSessionGetPixelBufferPool(compression_session_);
         is_keyframe_required = true;
     }
 #endif
@@ -667,10 +677,177 @@ void VTCompressionOutputCallbackData(void* encoder,
     return 0;
 }
 
+- (void)stopFile
+{
+    fclose(dataFile);
+}
+
 //const char* ImplementationName() const override;
+
+- (void)gotEncodedData:(NSData*)data isKeyFrame:(BOOL)isKeyFrame
+{
+    const char bytes[] = "\x00\x00\x00\x01";
+    size_t length = (sizeof bytes) - 1; //string literals have implicit trailing '\0'
+    NSData *ByteHeader = [NSData dataWithBytes:bytes length:length];
+    NSMutableData *h264Data = [[NSMutableData alloc] init];
+    [h264Data appendData:ByteHeader];
+    size_t size = fwrite([ByteHeader bytes], [ByteHeader length], 1, dataFile);
+    NSLog(@"%ld", size);
+    [h264Data appendData:data];
+    size = fwrite([data bytes], [data length], 1, dataFile);
+    NSLog(@"%ld", size);
+    
+    
+//    if (data!=nil)
+//    {
+//        
+//        
+//        H264_header h264Head;
+//        if (isKeyFrame==YES)
+//        {
+//            h264Head.bKeyFrame = 1;
+//            if (++mKeyFrameNo > 64)
+//            {
+//                mKeyFrameNo = 1;
+//            }
+//            mFrameIndex = 0;
+//        }
+//        else
+//        {
+//            h264Head.bKeyFrame = 0;
+//        }
+//        
+//        
+//        h264Head.m_bKeyNo = mKeyFrameNo;
+//        h264Head.m_btIndexNum = mFrameIndex++;
+//        h264Head.bSize = BSIZE;
+//        h264Head.bEncoder = 0;
+//        
+//        h264Head.bFlag = 1;
+//        
+//        unsigned char dataBuf[h264Data.length+3];
+//        memset(dataBuf, 0, h264Data.length+3);
+//        memcpy(dataBuf,&h264Head,sizeof(H264_header));
+//        memcpy(dataBuf+sizeof(H264_header),[h264Data bytes],h264Data.length);
+//        NSData *newData = [NSData dataWithBytes:dataBuf length:h264Data.length+3];
+//        if (isKeyFrame==YES)
+//        {
+//            [self sendH264ToServer:newData];
+//        }
+//        else
+//        {
+//            [self sendH264ToServer:newData];
+//        }
+//        
+//        //        [h264Decoder receivedRawVideoFrame:[h264Data bytes] withSize:h264Data.length isIFrame:1];
+//        
+//        
+//    }
+    
+    
+    
+}
+
 
 - (void)OnEncodedFrame:(OSStatus)status Flag:(VTEncodeInfoFlags)info_flags Buffer:(CMSampleBufferRef)sample_buffer Info:(CodecSpecificInfo *)codec_specific_info Width:(int32_t)width Height:(int32_t)height RenderTime:(int64_t)render_time_ms                      TimeStamp:(uint32_t)timestamp Rotation:(VideoRotation)rotation
 {
+#if 0
+    //    NSLog(@"didCompressH264 called with status %d infoFlags %d", (int)status, (int)infoFlags);
+    if (status != 0) return;
+    
+    if (!CMSampleBufferDataIsReady(sample_buffer))
+    {
+        NSLog(@"didCompressH264 data is not ready ");
+        return;
+    }
+//    H264HwEncoderImpl* encoder = (__bridge H264HwEncoderImpl*)outputCallbackRefCon;
+    
+    // Check if we have got a key frame first
+    bool keyframe = false;
+    CFArrayRef attachmentss = CMSampleBufferGetSampleAttachmentsArray(sample_buffer, 0);
+    if (attachmentss != nil && CFArrayGetCount(attachmentss)) {
+        CFDictionaryRef attachment = static_cast<CFDictionaryRef>(CFArrayGetValueAtIndex(attachmentss, 0));
+        //        CFDictionaryRef attachment = CFArrayGetValueAtIndex(attachments, 0);
+        keyframe = !CFDictionaryContainsKey(attachment, kCMSampleAttachmentKey_NotSync);
+    }
+//    bool keyframe = !CFDictionaryContainsKey( (CFArrayGetValueAtIndex(CMSampleBufferGetSampleAttachmentsArray(sample_buffer, true), 0)), kCMSampleAttachmentKey_NotSync);
+    
+    if (keyframe)
+    {
+        CMFormatDescriptionRef format = CMSampleBufferGetFormatDescription(sample_buffer);
+        
+        size_t sparameterSetSize, sparameterSetCount;
+        const uint8_t *sparameterSet;
+        OSStatus statusCode = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(format, 0, &sparameterSet, &sparameterSetSize, &sparameterSetCount, 0 );
+        if (statusCode == noErr)
+        {
+            // Found sps and now check for pps
+            size_t pparameterSetSize, pparameterSetCount;
+            const uint8_t *pparameterSet;
+            OSStatus statusCode = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(format, 1, &pparameterSet, &pparameterSetSize, &pparameterSetCount, 0 );
+            if (statusCode == noErr)
+            {
+                // Found pps
+                const char bytes[] = "\x00\x00\x00\x01";
+                size_t length = (sizeof bytes) - 1; //string literals have implicit trailing '\0'
+                NSData *ByteHeader = [NSData dataWithBytes:bytes length:length];
+                size_t size = fwrite([ByteHeader bytes], [ByteHeader length], 1, dataFile);
+                NSLog(@"%ld", size);
+
+                NSData *sps = [NSData dataWithBytes:sparameterSet length:sparameterSetSize];
+                size = fwrite([sps bytes], [sps length], 1, dataFile);
+                NSLog(@"%ld", size);
+                size = fwrite([ByteHeader bytes], [ByteHeader length], 1, dataFile);
+                NSLog(@"%ld", size);
+                NSData *pps = [NSData dataWithBytes:pparameterSet length:pparameterSetSize];
+                size = fwrite([pps bytes], [pps length], 1, dataFile);
+                NSLog(@"%ld", size);
+//                if (encoder->_delegate)
+//                {
+//                    [encoder->_delegate gotSpsPps:encoder->sps pps:encoder->pps];
+//                }
+            }
+        }
+    }
+    
+    CMBlockBufferRef dataBuffer = CMSampleBufferGetDataBuffer(sample_buffer);
+    size_t length, totalLength;
+    char *dataPointer;
+    OSStatus statusCodeRet = CMBlockBufferGetDataPointer(dataBuffer, 0, &length, &totalLength, &dataPointer);
+    if (statusCodeRet == noErr) {
+        
+        size_t bufferOffset = 0;
+        static const int AVCCHeaderLength = 4;
+        while (bufferOffset < totalLength - AVCCHeaderLength) {
+            
+            // Read the NAL unit length
+            uint32_t NALUnitLength = 0;
+            memcpy(&NALUnitLength, dataPointer + bufferOffset, AVCCHeaderLength);
+            
+            // Convert the length value from Big-endian to Little-endian
+            NALUnitLength = CFSwapInt32BigToHost(NALUnitLength);
+            
+//            size_t size = fwrite((dataPointer + bufferOffset + AVCCHeaderLength), NALUnitLength, 1, dataFile);
+//            NSLog(@"%ld", size);
+            
+            NSData* data = [[NSData alloc] initWithBytes:(dataPointer + bufferOffset + AVCCHeaderLength) length:NALUnitLength];
+//            [encoder->_delegate gotEncodedData:data isKeyFrame:keyframe];
+//            [self gotEncodedData:data isKeyFrame:keyframe];
+            const char bytes[] = "\x00\x00\x00\x01";
+            size_t length = (sizeof bytes) - 1; //string literals have implicit trailing '\0'
+            NSData *ByteHeader = [NSData dataWithBytes:bytes length:length];
+            size_t size = fwrite([ByteHeader bytes], [ByteHeader length], 1, dataFile);
+            NSLog(@"%ld", size);
+            size = fwrite([data bytes], [data length], 1, dataFile);
+            NSLog(@"%ld", size);
+            
+            // Move to the next NAL unit in the block buffer
+            bufferOffset += AVCCHeaderLength + NALUnitLength;
+        }
+        
+    }
+#endif
+    
     if (status != noErr) {
 //        LOG(LS_ERROR) << "H264 encode failed.";
         return;
@@ -722,6 +899,11 @@ void VTCompressionOutputCallbackData(void* encoder,
 //            annexb_buffer->AppendData(kAnnexBHeaderBytes, sizeof(kAnnexBHeaderBytes));
 //            annexb_buffer->AppendData(reinterpret_cast<const char*>(param_set),
 //                                      param_set_size);
+            size_t size = fwrite(&kAnnexBHeaderBytes, sizeof(kAnnexBHeaderBytes), 1, dataFile);
+            NSLog(@"%ld", size);
+            size = fwrite(param_set, param_set_size, 1, dataFile);
+            NSLog(@"%ld", size);
+            
             // Update fragmentation.
             frag_offsets.push_back(nalu_offset + sizeof(kAnnexBHeaderBytes));
             frag_lengths.push_back(param_set_size);
@@ -737,8 +919,7 @@ void VTCompressionOutputCallbackData(void* encoder,
     }
     
     // Get block buffer from the sample buffer.
-    CMBlockBufferRef block_buffer =
-    CMSampleBufferGetDataBuffer(sample_buffer);
+    CMBlockBufferRef block_buffer = CMSampleBufferGetDataBuffer(sample_buffer);
     if (block_buffer == nil) {
 //        LOG(LS_ERROR) << "Failed to get sample buffer's block buffer.";
 //        return false;
@@ -788,8 +969,10 @@ void VTCompressionOutputCallbackData(void* encoder,
         // Update buffer.
 //        annexb_buffer->AppendData(kAnnexBHeaderBytes, sizeof(kAnnexBHeaderBytes));
 //        annexb_buffer->AppendData(data_ptr + nalu_header_size, packet_size);
-//        size_t size = fwrite(data_ptr + nalu_header_size, packet_size, 1, dataFile);
-//        NSLog(@"%ld", size);
+        size_t size = fwrite(&kAnnexBHeaderBytes, sizeof(kAnnexBHeaderBytes), 1, dataFile);
+        NSLog(@"%ld", size);
+        size = fwrite(data_ptr + nalu_header_size, packet_size, 1, dataFile);
+        NSLog(@"%ld", size);
         // Update fragmentation.
         frag_offsets.push_back(nalu_offset + sizeof(kAnnexBHeaderBytes));
         frag_lengths.push_back(packet_size);

@@ -202,6 +202,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 //    [yuv420DisplayView teardownGL];
 //    [yuv420DisplayView removeFromSuperview];
 //    yuv420DisplayView = nil;
+    
+    [_hdEncoder stopFile];
 }
 
 - (void)changeCamera
@@ -500,6 +502,14 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 //            [self.view addSubview:yuv420DisplayView];
 //        }
         static NSUInteger key = 3;
+        static NSUInteger count = 0;
+        if (count %10 == 0) {
+            key = 3;
+        }
+        else {
+            key = 0;
+        }
+        count++;
         [_hdEncoder Encode:yuv Info:nil Type:&key];
 //        [_hdEncoder EncodeCVI:imageBuffer Info:nil Type:&key];
         
