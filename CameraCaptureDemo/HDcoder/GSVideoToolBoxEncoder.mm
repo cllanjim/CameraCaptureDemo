@@ -8,6 +8,8 @@
 
 #import <vector>
 
+#import <VideoToolbox/VideoToolbox.h>
+
 #import "GSVideoToolBoxEncoder.h"
 #import "libyuv.h"
 
@@ -325,6 +327,16 @@ void VTCompressionOutputCallbackData(void* encoder,
                                    kVTCompressionPropertyKey_AllowFrameReordering,
                                    false);
     [self SetEncoderBitrateBps:target_bitrate_bps_];
+    
+//    CFNumberRef cfNum =
+//    CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &value);
+
+//    CFArrayCreate(kCFAllocatorDefault, <#const void **values#>, <#CFIndex numValues#>, <#const CFArrayCallBacks *callBacks#>)
+    OSStatus status  = VTSessionSetProperty(compression_session_, kVTCompressionPropertyKey_DataRateLimits, (__bridge CFArrayRef)@[@102400, @1]);//(800 * 1024 / 8)
+    if (status != noErr) {
+        NSLog(@"");
+    }
+    
     // TODO(tkchin): Look at entropy mode and colorspace matrices.
     // TODO(tkchin): Investigate to see if there's any way to make this work.
     // May need it to interop with Android. Currently this call just fails.
@@ -378,6 +390,15 @@ void VTCompressionOutputCallbackData(void* encoder,
         CFRelease(pixel_format);
         pixel_format = nil;
     }
+    /*mac OS
+    CFTypeRef kkeys[] = {kVTVideoEncoderSpecification_EnableHardwareAcceleratedVideoEncoder};
+    CFTypeRef vvalues[] = {kCFBooleanTrue};
+    CFDictionaryRef fframe_properties = CreateCFDictionary(kkeys, vvalues, 1);
+    NSDictionary *encoderSpecification = @{
+                                           (__bridge NSString *)kVTVideoEncoderSpecification_EnableHardwareAcceleratedVideoEncoder: @YES
+                                           };
+    
+    */
     __weak GSVideoToolBoxEncoder* weakSelf = self;
     OSStatus status = VTCompressionSessionCreate(
                                                  nil,  // use default allocator
@@ -499,7 +520,9 @@ void VTCompressionOutputCallbackData(void* encoder,
         //        }
     }
     
-    CMTime presentation_time_stamp = CMTimeMake(0, 1000);
+    static int64_t index = 0;
+    CMTime presentation_time_stamp = CMTimeMake(index, 1000);
+    index++;
     CFDictionaryRef frame_properties = nil;
     if (is_keyframe_required) {
         CFTypeRef keys[] = {kVTEncodeFrameOptionKey_ForceKeyFrame};

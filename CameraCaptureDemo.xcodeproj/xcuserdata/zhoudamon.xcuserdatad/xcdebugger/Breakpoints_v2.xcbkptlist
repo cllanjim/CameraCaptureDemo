@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CameraCaptureDemo/ViewController.m"
-            timestampString = "487389708.224835"
+            timestampString = "487580448.676071"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "468"
@@ -266,11 +266,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
-            timestampString = "487397058.820065"
+            timestampString = "487584759.473885"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "964"
-            endingLineNumber = "964"
+            startingLineNumber = "976"
+            endingLineNumber = "976"
             landmarkName = "-OnEncodedFrame:Flag:Buffer:Info:Width:Height:RenderTime:TimeStamp:Rotation:"
             landmarkType = "5">
          </BreakpointContent>
@@ -282,11 +282,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
-            timestampString = "487397058.820065"
+            timestampString = "487584759.473885"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "959"
-            endingLineNumber = "959"
+            startingLineNumber = "971"
+            endingLineNumber = "971"
             landmarkName = "-OnEncodedFrame:Flag:Buffer:Info:Width:Height:RenderTime:TimeStamp:Rotation:"
             landmarkType = "5">
          </BreakpointContent>
@@ -298,11 +298,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
-            timestampString = "487397058.820065"
+            timestampString = "487584759.473885"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "958"
-            endingLineNumber = "958"
+            startingLineNumber = "970"
+            endingLineNumber = "970"
             landmarkName = "-OnEncodedFrame:Flag:Buffer:Info:Width:Height:RenderTime:TimeStamp:Rotation:"
             landmarkType = "5">
          </BreakpointContent>
@@ -330,11 +330,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
-            timestampString = "487397058.820065"
+            timestampString = "487584759.473885"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "949"
-            endingLineNumber = "949"
+            startingLineNumber = "961"
+            endingLineNumber = "961"
             landmarkName = "-OnEncodedFrame:Flag:Buffer:Info:Width:Height:RenderTime:TimeStamp:Rotation:"
             landmarkType = "5">
          </BreakpointContent>
@@ -346,11 +346,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
-            timestampString = "487397058.820065"
+            timestampString = "487584759.473885"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "923"
-            endingLineNumber = "923"
+            startingLineNumber = "935"
+            endingLineNumber = "935"
             landmarkName = "-OnEncodedFrame:Flag:Buffer:Info:Width:Height:RenderTime:TimeStamp:Rotation:"
             landmarkType = "5">
          </BreakpointContent>
@@ -362,11 +362,43 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
-            timestampString = "487393129.114845"
+            timestampString = "487584759.473885"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "756"
-            endingLineNumber = "756"
+            startingLineNumber = "768"
+            endingLineNumber = "768"
+            landmarkName = "-OnEncodedFrame:Flag:Buffer:Info:Width:Height:RenderTime:TimeStamp:Rotation:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
+            timestampString = "487584759.473885"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "845"
+            endingLineNumber = "845"
+            landmarkName = "-OnEncodedFrame:Flag:Buffer:Info:Width:Height:RenderTime:TimeStamp:Rotation:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
+            timestampString = "487584759.473885"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "831"
+            endingLineNumber = "831"
             landmarkName = "-OnEncodedFrame:Flag:Buffer:Info:Width:Height:RenderTime:TimeStamp:Rotation:"
             landmarkType = "5">
          </BreakpointContent>
@@ -378,75 +410,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
-            timestampString = "487390177.157289"
+            timestampString = "487584759.473885"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "308"
-            endingLineNumber = "308"
-            landmarkName = "-SetEncoderBitrateBps:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
-            timestampString = "487390178.341311"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "319"
-            endingLineNumber = "319"
-            landmarkName = "-ConfigureCompressionSession"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
-            timestampString = "487396264.555458"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "833"
-            endingLineNumber = "833"
-            landmarkName = "-OnEncodedFrame:Flag:Buffer:Info:Width:Height:RenderTime:TimeStamp:Rotation:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
-            timestampString = "487396264.555458"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "819"
-            endingLineNumber = "819"
-            landmarkName = "-OnEncodedFrame:Flag:Buffer:Info:Width:Height:RenderTime:TimeStamp:Rotation:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
-            timestampString = "487393843.186453"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "691"
-            endingLineNumber = "691"
+            startingLineNumber = "703"
+            endingLineNumber = "703"
             landmarkName = "-gotEncodedData:isKeyFrame:"
             landmarkType = "5">
          </BreakpointContent>
@@ -458,12 +426,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CameraCaptureDemo/HDcoder/GSVideoToolBoxEncoder.mm"
-            timestampString = "487396476.735475"
+            timestampString = "487580513.16605"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "798"
-            endingLineNumber = "798"
-            landmarkName = "-OnEncodedFrame:Flag:Buffer:Info:Width:Height:RenderTime:TimeStamp:Rotation:"
+            startingLineNumber = "312"
+            endingLineNumber = "312"
+            landmarkName = "-SetEncoderBitrateBps:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

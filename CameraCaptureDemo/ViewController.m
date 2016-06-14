@@ -75,7 +75,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     [super viewDidLoad];
     
     currentDisplayMode = VideoDisplayMode_OpenGLES;
-    frames = 10;
+    frames = 30;
     
     yuv420Data = [[BufferManager alloc] init];
     
@@ -345,9 +345,9 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     codec_.maxFramerate = 30;
     codec_.width = 640;
     codec_.height = 480;
-    codec_.startBitrate = 512;
-    codec_.maxFramerate = 10;
+    codec_.startBitrate = 1280*4;
     [_hdEncoder InitEncode:codec_ Cores:2 Payload:800];
+//    [_hdEncoder SetRates:<#(uint32_t)#> Rate:<#(uint32_t)#>]
 }
 
 - (BOOL)updateVideoOrientation
@@ -510,8 +510,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
             key = 0;
         }
         count++;
-        [_hdEncoder Encode:yuv Info:nil Type:&key];
-//        [_hdEncoder EncodeCVI:imageBuffer Info:nil Type:&key];
+//        [_hdEncoder Encode:yuv Info:nil Type:&key];
+        [_hdEncoder EncodeCVI:imageBuffer Info:nil Type:&key];
         
         [yuv420DisplayView renderFrame:yuv];
         
