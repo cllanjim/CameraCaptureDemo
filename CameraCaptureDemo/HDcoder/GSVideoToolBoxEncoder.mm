@@ -318,24 +318,36 @@ void VTCompressionOutputCallbackData(void* encoder,
 -(void)ConfigureCompressionSession
 {
 //    RTC_DCHECK(compression_session_);
-    SetVTSessionPropertyOne(compression_session_,
-                                   kVTCompressionPropertyKey_RealTime, true);
+//    SetVTSessionPropertyOne(compression_session_,
+//                                   kVTCompressionPropertyKey_RealTime, true);
     SetVTSessionPropertyFour(compression_session_,
                                    kVTCompressionPropertyKey_ProfileLevel,
-                                   kVTProfileLevel_H264_Baseline_AutoLevel);//kVTProfileLevel_H264_Baseline_AutoLevel//kVTProfileLevel_H264_Baseline_4_1
-    SetVTSessionPropertyThree(compression_session_,
-                                   kVTCompressionPropertyKey_AllowFrameReordering,
-                                   false);
-    [self SetEncoderBitrateBps:target_bitrate_bps_];
+                                   kVTProfileLevel_H264_High_AutoLevel);//kVTProfileLevel_H264_Baseline_AutoLevel//kVTProfileLevel_H264_Baseline_4_1
+//    SetVTSessionPropertyThree(compression_session_,
+//                                   kVTCompressionPropertyKey_AllowFrameReordering,
+//                                   false);
+//    [self SetEncoderBitrateBps:target_bitrate_bps_];
+    SetVTSessionPropertyTwo(compression_session_,
+                            kVTCompressionPropertyKey_AverageBitRate,
+                            target_bitrate_bps_);
     
 //    CFNumberRef cfNum =
 //    CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &value);
 
 //    CFArrayCreate(kCFAllocatorDefault, <#const void **values#>, <#CFIndex numValues#>, <#const CFArrayCallBacks *callBacks#>)
-    OSStatus status  = VTSessionSetProperty(compression_session_, kVTCompressionPropertyKey_DataRateLimits, (__bridge CFArrayRef)@[@102400, @1]);//(800 * 1024 / 8)
+    OSStatus status  = VTSessionSetProperty(compression_session_, kVTCompressionPropertyKey_DataRateLimits, (__bridge CFArrayRef)@[@102400000, @1]);//(800 * 1024 / 8)
     if (status != noErr) {
         NSLog(@"");
     }
+    
+    SetVTSessionPropertyTwo(
+     compression_session_,
+     kVTCompressionPropertyKey_MaxKeyFrameInterval, 240);
+    VTSessionSetProperty(compression_session_, kVTCompressionPropertyKey_H264EntropyMode, kVTH264EntropyMode_CABAC);
+    VTSessionSetProperty(compression_session_, kVTCompressionPropertyKey_RealTime, kCFBooleanTrue);
+    VTSessionSetProperty(compression_session_, kVTCompressionPropertyKey_AllowFrameReordering, kCFBooleanFalse);
+    
+//    VTSessionSetProperty(compression_session_, kVTCompressionPropertyKey_ProfileLevel, kVTProfileLevel_H264_High_AutoLevel);
     
     // TODO(tkchin): Look at entropy mode and colorspace matrices.
     // TODO(tkchin): Investigate to see if there's any way to make this work.
@@ -519,6 +531,10 @@ void VTCompressionOutputCallbackData(void* encoder,
         //            }
         //        }
     }
+    
+//    _frame.set_rotation(kVideoRotation_0);
+//    _frame.set_ntp_time_ms(0);
+//    _frame.set_render_time_ms(TickTime::MillisecondTimestamp());
     
     static int64_t index = 0;
     CMTime presentation_time_stamp = CMTimeMake(index, 1000);

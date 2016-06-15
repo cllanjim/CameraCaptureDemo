@@ -345,7 +345,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     codec_.maxFramerate = 30;
     codec_.width = 640;
     codec_.height = 480;
-    codec_.startBitrate = 1280*4;
+    codec_.startBitrate = 640*480*7.5*10;
     [_hdEncoder InitEncode:codec_ Cores:2 Payload:800];
 //    [_hdEncoder SetRates:<#(uint32_t)#> Rate:<#(uint32_t)#>]
 }
@@ -510,6 +510,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
             key = 0;
         }
         count++;
+        
 //        [_hdEncoder Encode:yuv Info:nil Type:&key];
         [_hdEncoder EncodeCVI:imageBuffer Info:nil Type:&key];
         
