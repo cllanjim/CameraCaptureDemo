@@ -144,11 +144,22 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     [btn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     [self.view addSubview:btn];
     
+    btn = [UIButton buttonWithType:UIButtonTypeSystem];
+    btn.frame = CGRectMake(0, 0, 100, 44);
+    btn.center = CGPointMake(self.view.center.x, self.view.center.y + 88 + 44);
+    [btn addTarget:self action:@selector(drawnOnePic) forControlEvents:UIControlEventTouchUpInside];
+    [btn setTitle:@"绘制图片" forState:UIControlStateNormal];
+    [btn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+    [self.view addSubview:btn];
+    
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
     
     
     [self initVideoToolBoxEncoder];
+    
+    
+    self.view.backgroundColor = [UIColor grayColor];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -215,6 +226,11 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
         currentCameraPosition = AVCaptureDevicePositionFront;
     }
     [self changeCameraPosition:currentCameraPosition];
+}
+
+- (void)drawnOnePic
+{
+    
 }
 
 /*
@@ -334,6 +350,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     openGLContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     glkView = [[GLKView alloc] initWithFrame:[UIScreen mainScreen].bounds context:openGLContext];
     ciContext = [CIContext contextWithEAGLContext:openGLContext];
+    glkView.backgroundColor = [UIColor clearColor];
     [self.view addSubview:glkView];
 }
 
@@ -345,7 +362,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     codec_.maxFramerate = 30;
     codec_.width = 640;
     codec_.height = 480;
-    codec_.startBitrate = 640*480*7.5*10;
+    codec_.startBitrate = 1024*1024*1.5;//640*480*7.5*10;
     [_hdEncoder InitEncode:codec_ Cores:2 Payload:800];
 //    [_hdEncoder SetRates:<#(uint32_t)#> Rate:<#(uint32_t)#>]
 }

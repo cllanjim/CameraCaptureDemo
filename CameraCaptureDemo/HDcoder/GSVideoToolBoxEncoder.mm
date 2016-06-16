@@ -327,6 +327,7 @@ void VTCompressionOutputCallbackData(void* encoder,
 //                                   kVTCompressionPropertyKey_AllowFrameReordering,
 //                                   false);
 //    [self SetEncoderBitrateBps:target_bitrate_bps_];
+    //码率的平均值，单位是bps
     SetVTSessionPropertyTwo(compression_session_,
                             kVTCompressionPropertyKey_AverageBitRate,
                             target_bitrate_bps_);
@@ -334,7 +335,8 @@ void VTCompressionOutputCallbackData(void* encoder,
 //    CFNumberRef cfNum =
 //    CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &value);
 
-//    CFArrayCreate(kCFAllocatorDefault, <#const void **values#>, <#CFIndex numValues#>, <#const CFArrayCallBacks *callBacks#>)
+
+    //码率的上限设置，单位byte in seconds
     OSStatus status  = VTSessionSetProperty(compression_session_, kVTCompressionPropertyKey_DataRateLimits, (__bridge CFArrayRef)@[@102400000, @1]);//(800 * 1024 / 8)
     if (status != noErr) {
         NSLog(@"");
@@ -342,7 +344,7 @@ void VTCompressionOutputCallbackData(void* encoder,
     
     SetVTSessionPropertyTwo(
      compression_session_,
-     kVTCompressionPropertyKey_MaxKeyFrameInterval, 240);
+     kVTCompressionPropertyKey_MaxKeyFrameInterval, 10);
     VTSessionSetProperty(compression_session_, kVTCompressionPropertyKey_H264EntropyMode, kVTH264EntropyMode_CABAC);
     VTSessionSetProperty(compression_session_, kVTCompressionPropertyKey_RealTime, kCFBooleanTrue);
     VTSessionSetProperty(compression_session_, kVTCompressionPropertyKey_AllowFrameReordering, kCFBooleanFalse);
