@@ -150,6 +150,14 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     [btn addTarget:self action:@selector(drawnOnePic) forControlEvents:UIControlEventTouchUpInside];
     [btn setTitle:@"绘制图片" forState:UIControlStateNormal];
     [btn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+    btn.backgroundColor = [UIColor whiteColor];
+    
+    UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:btn.bounds byRoundingCorners:UIRectCornerAllCorners cornerRadii:CGSizeMake(8,8)];
+    CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
+    maskLayer.frame = btn.bounds;
+    maskLayer.path = maskPath.CGPath;
+    btn.layer.mask = maskLayer;
+    
     [self.view addSubview:btn];
     
     
