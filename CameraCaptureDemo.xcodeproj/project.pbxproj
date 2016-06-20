@@ -61,6 +61,7 @@
 		8572B2221CFBEE9E000A2EE3 /* scale_neon64.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8572B1F71CFBEE9E000A2EE3 /* scale_neon64.cc */; };
 		8572B2231CFBEE9E000A2EE3 /* scale_win.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8572B1F81CFBEE9E000A2EE3 /* scale_win.cc */; };
 		8572B2241CFBEE9E000A2EE3 /* video_common.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8572B1F91CFBEE9E000A2EE3 /* video_common.cc */; };
+		8586AB661D178B0F0065CB59 /* GSVideoToolBoxDecoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8586AB651D178B0F0065CB59 /* GSVideoToolBoxDecoder.mm */; };
 		859DA9C81D052F3D0063BEE2 /* GSVideoToolBoxEncoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 859DA9C71D052F3D0063BEE2 /* GSVideoToolBoxEncoder.mm */; };
 		859DA9D91D0560080063BEE2 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859DA9D81D0560080063BEE2 /* CoreMedia.framework */; };
 		85A257C51CA8E08E001202FE /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85A257C41CA8E08E001202FE /* AVKit.framework */; };
@@ -156,6 +157,9 @@
 		8572B2371CFBEF00000A2EE3 /* video_common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = video_common.h; sourceTree = "<group>"; };
 		8572B2381CFBF1EE000A2EE3 /* tes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tes.h; sourceTree = "<group>"; };
 		8572B2391CFBF1EE000A2EE3 /* tes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = tes.m; sourceTree = "<group>"; };
+		8586AB641D178B0F0065CB59 /* GSVideoToolBoxDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GSVideoToolBoxDecoder.h; path = HDcoder/GSVideoToolBoxDecoder.h; sourceTree = "<group>"; };
+		8586AB651D178B0F0065CB59 /* GSVideoToolBoxDecoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GSVideoToolBoxDecoder.mm; path = HDcoder/GSVideoToolBoxDecoder.mm; sourceTree = "<group>"; };
+		8586AB671D178D4B0065CB59 /* CommonVideoType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CommonVideoType.h; path = HDcoder/CommonVideoType.h; sourceTree = "<group>"; };
 		859DA9C61D052F3D0063BEE2 /* GSVideoToolBoxEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GSVideoToolBoxEncoder.h; path = HDcoder/GSVideoToolBoxEncoder.h; sourceTree = "<group>"; };
 		859DA9C71D052F3D0063BEE2 /* GSVideoToolBoxEncoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GSVideoToolBoxEncoder.mm; path = HDcoder/GSVideoToolBoxEncoder.mm; sourceTree = "<group>"; };
 		859DA9D81D0560080063BEE2 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
@@ -360,6 +364,9 @@
 			children = (
 				859DA9C61D052F3D0063BEE2 /* GSVideoToolBoxEncoder.h */,
 				859DA9C71D052F3D0063BEE2 /* GSVideoToolBoxEncoder.mm */,
+				8586AB641D178B0F0065CB59 /* GSVideoToolBoxDecoder.h */,
+				8586AB651D178B0F0065CB59 /* GSVideoToolBoxDecoder.mm */,
+				8586AB671D178D4B0065CB59 /* CommonVideoType.h */,
 			);
 			name = hdCoder;
 			sourceTree = "<group>";
@@ -457,6 +464,7 @@
 				8572B20A1CFBEE9E000A2EE3 /* planar_functions.cc in Sources */,
 				8572B2111CFBEE9E000A2EE3 /* rotate_neon.cc in Sources */,
 				859DA9C81D052F3D0063BEE2 /* GSVideoToolBoxEncoder.mm in Sources */,
+				8586AB661D178B0F0065CB59 /* GSVideoToolBoxDecoder.mm in Sources */,
 				856648F91CA269000075FC36 /* ViewController.m in Sources */,
 				8572B21D1CFBEE9E000A2EE3 /* scale_argb.cc in Sources */,
 				8572B2041CFBEE9E000A2EE3 /* convert_jpeg.cc in Sources */,

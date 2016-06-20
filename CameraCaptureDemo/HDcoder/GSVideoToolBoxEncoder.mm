@@ -221,31 +221,31 @@ void VTCompressionOutputCallbackData(void* encoder,
     NSLog(@"");
 }
 
-@implementation VideoCodec
-
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        
-    }
-    return self;
-}
-
-@end
-
-@implementation FrameEncodeParams
-
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        
-    }
-    return self;
-}
-
-@end
+//@implementation VideoCodec
+//
+//- (id)init
+//{
+//    self = [super init];
+//    if (self) {
+//        
+//    }
+//    return self;
+//}
+//
+//@end
+//
+//@implementation FrameEncodeParams
+//
+//- (id)init
+//{
+//    self = [super init];
+//    if (self) {
+//        
+//    }
+//    return self;
+//}
+//
+//@end
 
 @interface GSVideoToolBoxEncoder ()
 {

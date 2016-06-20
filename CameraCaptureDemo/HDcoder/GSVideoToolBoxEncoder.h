@@ -14,6 +14,7 @@
 
 //#import "commonType.h"
 #import "YUV420Data.h"
+#import "CommonVideoType.h"
 
 //// Video codec
 //enum { kConfigParameterSize = 128};
@@ -60,22 +61,22 @@
 //
 //// Simulcast is when the same stream is encoded multiple times with different
 //// settings such as resolution.
-struct SimulcastStream {
-    unsigned short      width;
-    unsigned short      height;
-    unsigned char       numberOfTemporalLayers;
-    unsigned int        maxBitrate;  // kilobits/sec.
-    unsigned int        targetBitrate;  // kilobits/sec.
-    unsigned int        minBitrate;  // kilobits/sec.
-    unsigned int        qpMax; // minimum quality
-};
-//
-struct SpatialLayer {
-    int scaling_factor_num;
-    int scaling_factor_den;
-    int target_bitrate_bps;
-    // TODO(ivica): Add max_quantizer and min_quantizer?
-};
+//struct SimulcastStream {
+//    unsigned short      width;
+//    unsigned short      height;
+//    unsigned char       numberOfTemporalLayers;
+//    unsigned int        maxBitrate;  // kilobits/sec.
+//    unsigned int        targetBitrate;  // kilobits/sec.
+//    unsigned int        minBitrate;  // kilobits/sec.
+//    unsigned int        qpMax; // minimum quality
+//};
+////
+//struct SpatialLayer {
+//    int scaling_factor_num;
+//    int scaling_factor_den;
+//    int target_bitrate_bps;
+//    // TODO(ivica): Add max_quantizer and min_quantizer?
+//};
 //
 //enum VideoCodecMode {
 //    kRealtimeVideo,
@@ -83,64 +84,64 @@ struct SpatialLayer {
 //};
 
 
-typedef NS_ENUM(NSUInteger, VideoCodecType)
-{
-    VideoCodecType_H264 = 0
-};
-// Common video codec properties
-@interface VideoCodec : NSObject
-
-@property (nonatomic) VideoCodecType      codecType;
-@property (nonatomic)    NSString *                plName;//kPayloadNameSize
-@property (nonatomic)    unsigned char       plType;
-    
-@property (nonatomic)    NSUInteger      width;
-@property (nonatomic)    NSUInteger      height;
-    
-@property (nonatomic)    NSUInteger        startBitrate;  // kilobits/sec.
-@property (nonatomic)    NSUInteger        maxBitrate;  // kilobits/sec.
-@property (nonatomic)    NSUInteger        minBitrate;  // kilobits/sec.
-@property (nonatomic)    NSUInteger        targetBitrate;  // kilobits/sec.
-    
-@property (nonatomic)    unsigned char       maxFramerate;
-    
-    //    VideoCodecUnion     codecSpecific;
-    
-@property (nonatomic)    NSUInteger        qpMax;
-@property (nonatomic)    unsigned char       numberOfSimulcastStreams;
-//    struct SimulcastStream     simulcastStream[4];//kMaxSimulcastStreams
-//    struct SpatialLayer spatialLayers[5];//kMaxSpatialLayers
-    
-    //    VideoCodecMode      mode;
-    
-    //    bool operator==(const VideoCodec& other) const = delete;
-    //    bool operator!=(const VideoCodec& other) const = delete;
-@end
-
-@class GSVideoToolBoxEncoder;
-@interface FrameEncodeParams : NSObject
-@property (nonatomic, strong) GSVideoToolBoxEncoder *encoder;
-
-@end
-
-@interface VideoFrame : NSObject
-
-@property (nonatomic) size_t width;
-@property (nonatomic) size_t height;
-
-@end
-
-//@protocol EncodedImageCallback <NSObject>
+//typedef NS_ENUM(NSUInteger, VideoCodecType)
+//{
+//    VideoCodecType_H264 = 0
+//};
+//// Common video codec properties
+//@interface VideoCodec : NSObject
 //
-//int32_t Encoded(const EncodedImage& encoded_image,
-//                const CodecSpecificInfo* codec_specific_info,
-//                const RTPFragmentationHeader* fragmentation) = 0;
+//@property (nonatomic) VideoCodecType      codecType;
+//@property (nonatomic)    NSString *                plName;//kPayloadNameSize
+//@property (nonatomic)    unsigned char       plType;
+//    
+//@property (nonatomic)    NSUInteger      width;
+//@property (nonatomic)    NSUInteger      height;
+//    
+//@property (nonatomic)    NSUInteger        startBitrate;  // kilobits/sec.
+//@property (nonatomic)    NSUInteger        maxBitrate;  // kilobits/sec.
+//@property (nonatomic)    NSUInteger        minBitrate;  // kilobits/sec.
+//@property (nonatomic)    NSUInteger        targetBitrate;  // kilobits/sec.
+//    
+//@property (nonatomic)    unsigned char       maxFramerate;
+//    
+//    //    VideoCodecUnion     codecSpecific;
+//    
+//@property (nonatomic)    NSUInteger        qpMax;
+//@property (nonatomic)    unsigned char       numberOfSimulcastStreams;
+////    struct SimulcastStream     simulcastStream[4];//kMaxSimulcastStreams
+////    struct SpatialLayer spatialLayers[5];//kMaxSpatialLayers
+//    
+//    //    VideoCodecMode      mode;
+//    
+//    //    bool operator==(const VideoCodec& other) const = delete;
+//    //    bool operator!=(const VideoCodec& other) const = delete;
+//@end
+//
+//@class GSVideoToolBoxEncoder;
+//@interface FrameEncodeParams : NSObject
+//@property (nonatomic, strong) GSVideoToolBoxEncoder *encoder;
 //
 //@end
-
-@interface CodecSpecificInfo : NSObject
-
-@end
+//
+//@interface VideoFrame : NSObject
+//
+//@property (nonatomic) size_t width;
+//@property (nonatomic) size_t height;
+//
+//@end
+//
+////@protocol EncodedImageCallback <NSObject>
+////
+////int32_t Encoded(const EncodedImage& encoded_image,
+////                const CodecSpecificInfo* codec_specific_info,
+////                const RTPFragmentationHeader* fragmentation) = 0;
+////
+////@end
+//
+//@interface CodecSpecificInfo : NSObject
+//
+//@end
 
 @protocol EncodedImageCallback <NSObject>
 
@@ -148,23 +149,23 @@ typedef NS_ENUM(NSUInteger, VideoCodecType)
 
 @end
 
-typedef NS_ENUM(NSUInteger, FrameType)
-{
-    kEmptyFrame = 0,
-    kAudioFrameSpeech = 1,
-    kAudioFrameCN = 2,
-    kVideoFrameKey = 3,
-    kVideoFrameDelta = 4
-};
-
-// enum for clockwise rotation.
-typedef NS_ENUM(NSUInteger, VideoRotation)
-{
-    kVideoRotation_0 = 0,
-    kVideoRotation_90 = 90,
-    kVideoRotation_180 = 180,
-    kVideoRotation_270 = 270
-};
+//typedef NS_ENUM(NSUInteger, FrameType)
+//{
+//    kEmptyFrame = 0,
+//    kAudioFrameSpeech = 1,
+//    kAudioFrameCN = 2,
+//    kVideoFrameKey = 3,
+//    kVideoFrameDelta = 4
+//};
+//
+//// enum for clockwise rotation.
+//typedef NS_ENUM(NSUInteger, VideoRotation)
+//{
+//    kVideoRotation_0 = 0,
+//    kVideoRotation_90 = 90,
+//    kVideoRotation_180 = 180,
+//    kVideoRotation_270 = 270
+//};
 
 @interface GSVideoToolBoxEncoder : NSObject
 
