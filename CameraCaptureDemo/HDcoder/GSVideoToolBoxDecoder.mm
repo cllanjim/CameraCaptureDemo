@@ -9,9 +9,12 @@
 #import <UIKit/UIKit.h>
 #import <vector>
 
+#import "libyuv/libyuv.h"
+
 #import "GSVideoToolBoxDecoder.h"
 
 static const int64_t kMsPerSec = 1000;
+static FILE *decoderYUVdataFile = nil;
 
 const char kAnnexBHeaderBytes[4] = {0, 0, 0, 1};
 const size_t kAvccHeaderByteSize = sizeof(uint32_t);
@@ -24,6 +27,8 @@ const size_t kAvccHeaderByteSize = sizeof(uint32_t);
     size_t next_offset_;
     size_t length_;
 }
+
+- (id)initWithData:(uint8_t *)annexb_buffer Length:(size_t)length;
 //public:
 //    AnnexBBufferReader(const uint8_t* annexb_buffer, size_t length);
 //    ~AnnexBBufferReader() {}
@@ -110,6 +115,70 @@ const size_t kAvccHeaderByteSize = sizeof(uint32_t);
 
 @end
 
+// Helper class for writing NALUs using avcc format into a buffer.
+@interface AvccBufferWriter : NSObject
+{
+    uint8_t* start_;
+    size_t offset_;
+    size_t length_;
+}
+//AvccBufferWriter(uint8_t* const avcc_buffer, size_t length);
+//~AvccBufferWriter() {}
+//AvccBufferWriter(const AvccBufferWriter& other) = delete;
+//void operator=(const AvccBufferWriter& other) = delete;
+
+// Writes the data slice into the buffer. Returns false if there isn't
+// enough space left.
+-(bool) WriteNalu:(uint8_t *)data Size:(size_t)data_size;
+
+// Returns the unused bytes in the buffer.
+-(size_t)BytesRemaining;
+
+- (id)initWithData:(uint8_t *)annexb_buffer Length:(size_t)length;
+
+//private:
+//uint8_t* const start_;
+//size_t offset_;
+//const size_t length_;
+@end
+
+@implementation AvccBufferWriter
+
+- (id)initWithData:(uint8_t *)annexb_buffer Length:(size_t)length
+{
+    self = [super init];
+    if (self) {
+        start_ = annexb_buffer;
+        offset_ = 0;
+        length_ = length;
+    }
+    
+    return self;
+}
+
+-(BOOL)WriteNalu:(uint8_t *)data Size:(size_t)data_size
+{
+    // Check if we can write this length of data.
+    if (data_size + kAvccHeaderByteSize > [self BytesRemaining]) {
+        return false;
+    }
+    // Write length header, which needs to be big endian.
+    uint32_t big_endian_length = CFSwapInt32HostToBig(data_size);
+    memcpy(start_ + offset_, &big_endian_length, sizeof(big_endian_length));
+    offset_ += sizeof(big_endian_length);
+    // Write data.
+    memcpy(start_ + offset_, data, data_size);
+    offset_ += data_size;
+    return true;
+}
+
+-(size_t)BytesRemaining{
+    return length_ - offset_;
+}
+
+@end
+
+
 // Convenience function for creating a dictionary.
 inline CFDictionaryRef CreateCFDictionary(CFTypeRef* keys,
                                           CFTypeRef* values,
@@ -140,8 +209,92 @@ void VTDecompressionOutputCallback(void* decoder,
 //                                     CMTimeGetSeconds(timestamp) * kMsPerSec,
 //                                     webrtc::kVideoRotation_0);
 //    decode_params->callback->Decoded(decoded_frame);
+    
+//    GSVideoToolBoxDecoder *decoder =
+    
+    if(CVPixelBufferLockBaseAddress(image_buffer, 0) == kCVReturnSuccess)
+    {
+        //        UInt8 *bufferbasePtr = (UInt8 *)CVPixelBufferGetBaseAddress(imageBuffer);
+        UInt8 *bufferPtr = (UInt8 *)CVPixelBufferGetBaseAddressOfPlane(image_buffer,0);
+        UInt8 *bufferPtr1 = (UInt8 *)CVPixelBufferGetBaseAddressOfPlane(image_buffer,1);
+        //        size_t buffeSize = CVPixelBufferGetDataSize(imageBuffer);
+        size_t width = CVPixelBufferGetWidth(image_buffer);
+        size_t height = CVPixelBufferGetHeight(image_buffer);
+        //        size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+        size_t bytesrow0 = CVPixelBufferGetBytesPerRowOfPlane(image_buffer,0);
+        size_t bytesrow1  = CVPixelBufferGetBytesPerRowOfPlane(image_buffer,1);
+        //        size_t bytesrow2 = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer,2);
+        //        UInt8 *yuv420_data = (UInt8 *)malloc(width * height *3/ 2);//buffer to store YUV with layout YYYYYYYYUUVV
+        //        memset(yuv420_data, 0, width * height *3/ 2);
+        
+        /* convert NV21 data to YUV420*/
+        
+        //
+        const int kYPlaneIndex = 0;
+        const int kUVPlaneIndex = 1;
+        size_t yPlaneBytesPerRow =
+        CVPixelBufferGetBytesPerRowOfPlane(image_buffer, kYPlaneIndex);
+        size_t yPlaneHeight = CVPixelBufferGetHeightOfPlane(image_buffer, kYPlaneIndex);
+        size_t uvPlaneBytesPerRow =
+        CVPixelBufferGetBytesPerRowOfPlane(image_buffer, kUVPlaneIndex);
+        size_t uvPlaneHeight =
+        CVPixelBufferGetHeightOfPlane(image_buffer, kUVPlaneIndex);
+        size_t frameSize =
+        yPlaneBytesPerRow * yPlaneHeight + uvPlaneBytesPerRow * uvPlaneHeight;
+        int stride_y = (int)width;
+        int stride_uv = ((int)width + 1) / 2;
+        int memmoryLength = width*height*3/2;//stride_y * (int)height + (stride_uv + stride_uv) * (((int)height + 1) / 2);
+        UInt8 *yuv420_data = (UInt8 *)malloc(memmoryLength);//buffer to store YUV with layout YYYYYYYYUUVV
+        memset(yuv420_data, 0, memmoryLength);
+        
+        UInt8 *yBuffer = yuv420_data;
+        UInt8 *uBuffer = yBuffer + stride_y * height;
+        UInt8 *vBuffer = uBuffer + stride_uv * ((height + 1) / 2);
+        ConvertToI420(bufferPtr, frameSize, yBuffer, stride_y, uBuffer, stride_uv, vBuffer, stride_uv, 0, 0, (int)width, (int)height, (int)width, (int)height, libyuv::kRotate0,
+                      libyuv::FOURCC_NV12);
+        
+        size_t size = fwrite(yuv420_data, memmoryLength, 1, decoderYUVdataFile);
+        NSLog(@"%ld", size);
+        free(yuv420_data);
+        
+        //        UInt8 *pY = bufferPtr ;
+        //        UInt8 *pUV = bufferPtr1;
+        //        UInt8 *pU = yuv420_data + width*height;
+        //        UInt8 *pV = pU + width*height/4;
+        
+        //        for(int i =0;i<height;i++)
+        //        {
+        //            memcpy(yuv420_data+i*width,pY+i*bytesrow0,width);
+        //        }
+        //        for(int j = 0;j<height/2;j++)
+        //        {
+        //            for(int i =0;i<width/2;i++)
+        //            {
+        //                *(pU++) = pUV[i<<1];
+        //                *(pV++) = pUV[(i<<1) + 1];
+        //            }
+        //            pUV+=bytesrow1;
+        //        }
+        //add code to push yuv420_data to video encoder here
+        //        NSData *data = [NSData dataWithBytes:yuv420_data length:memmoryLength];
+        //        [yuv420Data addData:data];
+//        YUV420Data *yuv = [[YUV420Data alloc] initWithYUV420Data:yuv420_data Width:VIDEO_WIDTH Height:VIDEO_HEIGHT];
+        
+        //        if (!yuv420DisplayView) {
+        //            yuv420DisplayView = [[GSOpenGLESDisplayYUV420View alloc] initWithFrame:CGRectMake(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT)];
+        //            yuv420DisplayView.center = self.view.center;
+        //            yuv420DisplayView.transform = CGAffineTransformMakeScale(0.5f, 0.5f);
+        //            yuv420DisplayView.transform = CGAffineTransformRotate(yuv420DisplayView.transform, M_PI/2);
+        //            [self.view addSubview:yuv420DisplayView];
+        //        }
+        
+        /* unlock the buffer*/
+        CVPixelBufferUnlockBaseAddress(image_buffer, 0);
+    }
+
 }
-}
+    
+}//internal
 
 
 @interface GSVideoToolBoxDecoder ()
@@ -154,9 +307,38 @@ void VTDecompressionOutputCallback(void* decoder,
 
 @implementation GSVideoToolBoxDecoder
 
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *path = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"yuv420"];
+        NSFileManager *manager = [NSFileManager defaultManager];
+        if (NO == [manager fileExistsAtPath:path]) {
+            [manager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
+        }
+        
+        NSString *fullPath = [path stringByAppendingPathComponent:@"datah264decoder"];
+        if ([manager fileExistsAtPath:fullPath]) {
+            [manager removeItemAtPath:fullPath error:nil];
+        }
+        [manager createFileAtPath:fullPath contents:nil attributes:nil];
+        
+        decoderYUVdataFile = fopen([fullPath UTF8String], "wb");
+    }
+    return self;
+}
+
 - (int)InitDecode:(VideoCodec *)video_codec Cores:(NSInteger)number_of_cores
 {
+    
     return 0;
+}
+
+-(void)dealloc
+{
+    [self DestroyDecompressionSession];
+    [self SetVideoFormat:nil];
 }
 
 -(int)Decode:(uint8_t *)input_image
@@ -204,11 +386,10 @@ InputImageLength:(size_t)length
 //        return WEBRTC_VIDEO_CODEC_ERROR;
     }
     CMSampleBufferRef sample_buffer = nullptr;
-//    if (![self H264AnnexBBufferToCMSampleBuffer(input_image._buffer,
-//                                          input_image._length, video_format_,
-//                                          &sample_buffer)) {
+    if (![self H264AnnexBBufferToCMSampleBuffer:input_image
+                                          Size:length VideoFormat:video_format_ OutBuffer:&sample_buffer]) {
 //        return WEBRTC_VIDEO_CODEC_ERROR;
-//    }
+    }
 //    RTC_DCHECK(sample_buffer);
     VTDecodeFrameFlags decode_flags =
     kVTDecodeFrame_EnableAsynchronousDecompression;
@@ -462,13 +643,14 @@ InputImageLength:(size_t)length
     }
     
     // Write Avcc NALUs into block buffer memory.
-    AvccBufferWriter writer(reinterpret_cast<uint8_t*>(data_ptr),
-                            block_buffer_size);
+//    AvccBufferWriter writer(reinterpret_cast<uint8_t*>(data_ptr),
+//                            block_buffer_size);
+    AvccBufferWriter *writer = [[AvccBufferWriter alloc] initWithData:(uint8_t *)data_ptr Length:block_buffer_size];
     while ([reader BytesRemaining] > 0) {
-        const uint8_t* nalu_data_ptr = nullptr;
+        uint8_t* nalu_data_ptr = nullptr;
         size_t nalu_data_size = 0;
-        if (reader.ReadNalu(&nalu_data_ptr, &nalu_data_size)) {
-            writer.WriteNalu(nalu_data_ptr, nalu_data_size);
+        if ([reader ReadNalu:&nalu_data_ptr Length:&nalu_data_size]) {
+            [writer WriteNalu:nalu_data_ptr Size:nalu_data_size];
         }
     }
     
@@ -477,7 +659,7 @@ InputImageLength:(size_t)length
                                   nullptr, video_format, 1, 0, nullptr, 0,
                                   nullptr, out_sample_buffer);
     if (status != noErr) {
-        LOG(LS_ERROR) << "Failed to create sample buffer.";
+//        LOG(LS_ERROR) << "Failed to create sample buffer.";
         CFRelease(contiguous_buffer);
         return false;
     }

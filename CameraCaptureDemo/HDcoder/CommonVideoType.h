@@ -80,32 +80,6 @@ typedef NS_ENUM(NSUInteger, VideoCodecType)
 
 @end
 
-@implementation VideoCodec
-
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        
-    }
-    return self;
-}
-
-@end
-
-@implementation FrameEncodeParams
-
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        
-    }
-    return self;
-}
-
-@end
-
 typedef NS_ENUM(NSUInteger, FrameType)
 {
     kEmptyFrame = 0,

@@ -146,6 +146,7 @@
 @protocol EncodedImageCallback <NSObject>
 
 - (void)Encoded:(uint8_t *)encoded_image Info:(uint8_t *)codec_specific_info Header:(uint8_t *)fragmentation;
+- (void)NaluDataCallback:(uint8_t *)nalu Length:(NSUInteger)length;
 
 @end
 
@@ -169,7 +170,7 @@
 
 @interface GSVideoToolBoxEncoder : NSObject
 
-@property (nonatomic, assign)id<EncodedImageCallback>delegate;
+@property (nonatomic, weak)id<EncodedImageCallback>delegate;
 
 -(int)InitEncode:(VideoCodec *)codec_settings Cores:(int)number_of_cores Payload:(size_t)max_payload_size;
 

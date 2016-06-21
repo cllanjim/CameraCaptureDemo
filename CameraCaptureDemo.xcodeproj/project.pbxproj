@@ -62,6 +62,7 @@
 		8572B2231CFBEE9E000A2EE3 /* scale_win.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8572B1F81CFBEE9E000A2EE3 /* scale_win.cc */; };
 		8572B2241CFBEE9E000A2EE3 /* video_common.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8572B1F91CFBEE9E000A2EE3 /* video_common.cc */; };
 		8586AB661D178B0F0065CB59 /* GSVideoToolBoxDecoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8586AB651D178B0F0065CB59 /* GSVideoToolBoxDecoder.mm */; };
+		85984BA21D18CDCB00D2B854 /* CommonVideoType.m in Sources */ = {isa = PBXBuildFile; fileRef = 85984BA11D18CDCB00D2B854 /* CommonVideoType.m */; };
 		859DA9C81D052F3D0063BEE2 /* GSVideoToolBoxEncoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 859DA9C71D052F3D0063BEE2 /* GSVideoToolBoxEncoder.mm */; };
 		859DA9D91D0560080063BEE2 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 859DA9D81D0560080063BEE2 /* CoreMedia.framework */; };
 		85A257C51CA8E08E001202FE /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85A257C41CA8E08E001202FE /* AVKit.framework */; };
@@ -160,6 +161,7 @@
 		8586AB641D178B0F0065CB59 /* GSVideoToolBoxDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GSVideoToolBoxDecoder.h; path = HDcoder/GSVideoToolBoxDecoder.h; sourceTree = "<group>"; };
 		8586AB651D178B0F0065CB59 /* GSVideoToolBoxDecoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GSVideoToolBoxDecoder.mm; path = HDcoder/GSVideoToolBoxDecoder.mm; sourceTree = "<group>"; };
 		8586AB671D178D4B0065CB59 /* CommonVideoType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CommonVideoType.h; path = HDcoder/CommonVideoType.h; sourceTree = "<group>"; };
+		85984BA11D18CDCB00D2B854 /* CommonVideoType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CommonVideoType.m; path = HDcoder/CommonVideoType.m; sourceTree = "<group>"; };
 		859DA9C61D052F3D0063BEE2 /* GSVideoToolBoxEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GSVideoToolBoxEncoder.h; path = HDcoder/GSVideoToolBoxEncoder.h; sourceTree = "<group>"; };
 		859DA9C71D052F3D0063BEE2 /* GSVideoToolBoxEncoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GSVideoToolBoxEncoder.mm; path = HDcoder/GSVideoToolBoxEncoder.mm; sourceTree = "<group>"; };
 		859DA9D81D0560080063BEE2 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
@@ -367,6 +369,7 @@
 				8586AB641D178B0F0065CB59 /* GSVideoToolBoxDecoder.h */,
 				8586AB651D178B0F0065CB59 /* GSVideoToolBoxDecoder.mm */,
 				8586AB671D178D4B0065CB59 /* CommonVideoType.h */,
+				85984BA11D18CDCB00D2B854 /* CommonVideoType.m */,
 			);
 			name = hdCoder;
 			sourceTree = "<group>";
@@ -510,6 +513,7 @@
 				85F20A621CF9A0B6009D472E /* Fifo.cpp in Sources */,
 				8572B2221CFBEE9E000A2EE3 /* scale_neon64.cc in Sources */,
 				85F20A2E1CF45C23009D472E /* BufferManager.m in Sources */,
+				85984BA21D18CDCB00D2B854 /* CommonVideoType.m in Sources */,
 				8572B20B1CFBEE9E000A2EE3 /* rotate.cc in Sources */,
 				85B567F81CE2C4B100A80A5E /* OpenGLView20.m in Sources */,
 			);

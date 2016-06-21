@@ -26,6 +26,7 @@
 #import "YUV420Data.h"
 
 #import "GSVideoToolBoxEncoder.h"
+#import "GSVideoToolBoxDecoder.h"
 
 #define VIDEO_WIDTH 640
 #define VIDEO_HEIGHT 480
@@ -37,7 +38,8 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 };
 
 @interface ViewController ()
-<AVCaptureVideoDataOutputSampleBufferDelegate>
+<AVCaptureVideoDataOutputSampleBufferDelegate,
+EncodedImageCallback>
 {
     AVCaptureSession *captureSession;
     AVCaptureDevice *captureDevice;
@@ -65,6 +67,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     GSOpenGLESDisplayYUV420View *yuv420DisplayView;
     
     GSVideoToolBoxEncoder *_hdEncoder;
+    GSVideoToolBoxDecoder *_hdDecoder;
 }
 
 @end
@@ -165,6 +168,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     
     
     [self initVideoToolBoxEncoder];
+    [self initVideoToolBoxDecoder];
     
     
     self.view.backgroundColor = [UIColor grayColor];
@@ -365,6 +369,7 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
 - (void)initVideoToolBoxEncoder
 {
     _hdEncoder = [[GSVideoToolBoxEncoder alloc] init];
+    _hdEncoder.delegate = self;
     VideoCodec *codec_ = [[VideoCodec alloc] init];
     codec_.codecType = VideoCodecType_H264;
     codec_.maxFramerate = 30;
@@ -373,6 +378,12 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
     codec_.startBitrate = 1024*1024*1.5;//640*480*7.5*10;
     [_hdEncoder InitEncode:codec_ Cores:2 Payload:800];
 //    [_hdEncoder SetRates:<#(uint32_t)#> Rate:<#(uint32_t)#>]
+}
+
+- (void)initVideoToolBoxDecoder
+{
+    _hdDecoder = [[GSVideoToolBoxDecoder alloc] init];
+    
 }
 
 - (BOOL)updateVideoOrientation
@@ -438,6 +449,18 @@ typedef NS_ENUM(NSInteger, VideoDisplayMode)
             break;
     }
     
+}
+
+- (void)NaluDataCallback:(uint8_t *)nalu Length:(NSUInteger)length
+{
+    NSLog(@"");
+    
+    [_hdDecoder Decode:nalu InputImageLength:length MissFrames:YES Fragment:nil Info:nil RenderTime:0];
+}
+
+- (void)Encoded:(uint8_t *)encoded_image Info:(uint8_t *)codec_specific_info Header:(uint8_t *)fragmentation
+{
+    NSLog(@"");
 }
 
 // Handle device orientation changes

@@ -894,6 +894,9 @@ void VTCompressionOutputCallbackData(void* encoder,
         return;
     }
     
+    //data
+    NSMutableData *naluData = [[NSMutableData alloc] init];
+    
     // Get format description from the sample buffer.
     CMVideoFormatDescriptionRef description =
     CMSampleBufferGetFormatDescription(sample_buffer);
@@ -944,6 +947,9 @@ void VTCompressionOutputCallbackData(void* encoder,
             NSLog(@"%ld", size);
             size = fwrite(param_set, param_set_size, 1, dataFile);
             NSLog(@"%ld", size);
+            
+            [naluData appendBytes:&kAnnexBHeaderBytes length:sizeof(kAnnexBHeaderBytes)];
+            [naluData appendBytes:param_set length:param_set_size];
             
             // Update fragmentation.
             frag_offsets.push_back(nalu_offset + sizeof(kAnnexBHeaderBytes));
@@ -1014,6 +1020,10 @@ void VTCompressionOutputCallbackData(void* encoder,
         NSLog(@"%ld", size);
         size = fwrite(data_ptr + nalu_header_size, packet_size, 1, dataFile);
         NSLog(@"%ld", size);
+        
+        [naluData appendBytes:&kAnnexBHeaderBytes length:sizeof(kAnnexBHeaderBytes)];
+        [naluData appendBytes:(data_ptr + nalu_header_size) length:packet_size];
+        
         // Update fragmentation.
         frag_offsets.push_back(nalu_offset + sizeof(kAnnexBHeaderBytes));
         frag_lengths.push_back(packet_size);
@@ -1023,6 +1033,9 @@ void VTCompressionOutputCallbackData(void* encoder,
         bytes_remaining -= bytes_written;
         data_ptr += bytes_written;
     }
+    
+    
+    [self.delegate NaluDataCallback:(uint8_t *)[naluData bytes] Length:[naluData length]];
     
 //    size_t size = fwrite(data_ptr, block_buffer_size, 1, dataFile);
 //    NSLog(@"");
