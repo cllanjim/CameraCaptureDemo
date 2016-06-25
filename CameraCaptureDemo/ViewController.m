@@ -27,6 +27,7 @@
 
 #import "GSVideoToolBoxEncoder.h"
 #import "GSVideoToolBoxDecoder.h"
+#import "UIView+ScaleDrag.h"
 
 #define VIDEO_WIDTH 640
 #define VIDEO_HEIGHT 480
@@ -120,6 +121,10 @@ EncodedImageCallback>
     yuv420DisplayView.transform = CGAffineTransformMakeScale(0.5f, 0.5f);
     yuv420DisplayView.transform = CGAffineTransformRotate(yuv420DisplayView.transform, M_PI/2);
     [self.view addSubview:yuv420DisplayView];
+    
+//    [yuv420DisplayView addUIPinch];
+//    [yuv420DisplayView addUIPan];
+//    [yuv420DisplayView changeViewSize:yuv420DisplayView.bounds.size];
     
 //    [NSTimer scheduledTimerWithTimeInterval:frames/60 target:self selector:@selector(displayVideo) userInfo:nil repeats:YES];
     

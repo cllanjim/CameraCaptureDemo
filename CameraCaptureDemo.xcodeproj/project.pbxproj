@@ -69,6 +69,7 @@
 		85B169131CEC1AEA00DE9DFD /* GSOpenGLESView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85B169121CEC1AEA00DE9DFD /* GSOpenGLESView.m */; };
 		85B1693A1CEC800D00DE9DFD /* jpgimage1_image_640_480.yuv in Resources */ = {isa = PBXBuildFile; fileRef = 85B169391CEC800D00DE9DFD /* jpgimage1_image_640_480.yuv */; };
 		85B567F81CE2C4B100A80A5E /* OpenGLView20.m in Sources */ = {isa = PBXBuildFile; fileRef = 85B567F71CE2C4B100A80A5E /* OpenGLView20.m */; };
+		85CC32F91D1E60B500FCFB99 /* UIView+ScaleDrag.m in Sources */ = {isa = PBXBuildFile; fileRef = 85CC32F81D1E60B500FCFB99 /* UIView+ScaleDrag.m */; };
 		85F20A2B1CF4581C009D472E /* FileOperator.m in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A2A1CF4581C009D472E /* FileOperator.m */; };
 		85F20A2E1CF45C23009D472E /* BufferManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A2D1CF45C23009D472E /* BufferManager.m */; };
 		85F20A521CF826D0009D472E /* GSOpenGLESDisplayYUV420View.m in Sources */ = {isa = PBXBuildFile; fileRef = 85F20A511CF826D0009D472E /* GSOpenGLESDisplayYUV420View.m */; };
@@ -171,6 +172,8 @@
 		85B169391CEC800D00DE9DFD /* jpgimage1_image_640_480.yuv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = jpgimage1_image_640_480.yuv; sourceTree = "<group>"; };
 		85B567F61CE2C4B100A80A5E /* OpenGLView20.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLView20.h; sourceTree = "<group>"; };
 		85B567F71CE2C4B100A80A5E /* OpenGLView20.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OpenGLView20.m; sourceTree = "<group>"; };
+		85CC32F71D1E60B500FCFB99 /* UIView+ScaleDrag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+ScaleDrag.h"; sourceTree = "<group>"; };
+		85CC32F81D1E60B500FCFB99 /* UIView+ScaleDrag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+ScaleDrag.m"; sourceTree = "<group>"; };
 		85F20A291CF4581C009D472E /* FileOperator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileOperator.h; sourceTree = "<group>"; };
 		85F20A2A1CF4581C009D472E /* FileOperator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileOperator.m; sourceTree = "<group>"; };
 		85F20A2C1CF45C23009D472E /* BufferManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BufferManager.h; sourceTree = "<group>"; };
@@ -249,6 +252,8 @@
 				85F20A571CF9982E009D472E /* YUV420Data.m */,
 				85F20A291CF4581C009D472E /* FileOperator.h */,
 				85F20A2A1CF4581C009D472E /* FileOperator.m */,
+				85CC32F71D1E60B500FCFB99 /* UIView+ScaleDrag.h */,
+				85CC32F81D1E60B500FCFB99 /* UIView+ScaleDrag.m */,
 				85F20A591CF9A0B6009D472E /* FIFO */,
 				856648FA1CA269000075FC36 /* Main.storyboard */,
 				856648FD1CA269010075FC36 /* Assets.xcassets */,
@@ -474,6 +479,7 @@
 				8572B1FA1CFBEE9E000A2EE3 /* compare.cc in Sources */,
 				8572B20D1CFBEE9E000A2EE3 /* rotate_argb.cc in Sources */,
 				8572B1FB1CFBEE9E000A2EE3 /* compare_common.cc in Sources */,
+				85CC32F91D1E60B500FCFB99 /* UIView+ScaleDrag.m in Sources */,
 				8572B21B1CFBEE9E000A2EE3 /* scale.cc in Sources */,
 				85F20A2B1CF4581C009D472E /* FileOperator.m in Sources */,
 				8572B2161CFBEE9E000A2EE3 /* row_gcc.cc in Sources */,
